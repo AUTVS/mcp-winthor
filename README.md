@@ -67,9 +67,9 @@ Detalhes de setup, ingestão e paginação: [arquitetura](docs/arquitetura.md).
 
 Implantação, tools sob medida ou suporte WinThor:
 
-- WhatsApp: [wa.me/55XXXXXXXXXXX](https://wa.me/55XXXXXXXXXXX)
-- E-mail: [seu-email@exemplo.com](mailto:seu-email@exemplo.com)
-- Formulário: [exemplo.com/contato](https://exemplo.com/contato)
+- WhatsApp: [wa.me/5582999554270](https://wa.me/5582999554270)
+- E-mail: [leandro@nwerp.com.br](mailto:leandro@nwerp.com.br)
+- Formulário: [nwerp.ai/contato](https://nwerp.ai/contato)
 
 Canais e o que enviar na mensagem: [contato](docs/contato.md).
 

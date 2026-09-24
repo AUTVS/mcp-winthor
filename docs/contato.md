@@ -8,11 +8,9 @@ Serve para implantação, customização de tools, suporte ao ERP e ideias de ca
 
 | Canal | Link |
 | --- | --- |
-| WhatsApp | [Abrir conversa](https://wa.me/5582999554270) |
+| WhatsApp | [wa.me/5582999554270](https://wa.me/5582999554270) |
 | E-mail | [leandro@nwerp.com.br](mailto:leandro@nwerp.com.br) |
-| Formulário | [https://nwerp.ai/contato](https://nwerp.ai/contato) |
-
-Substitua os placeholders acima pelos seus dados reais antes de publicar o repositório.
+| Formulário | [nwerp.ai/contato](https://nwerp.ai/contato) |
 
 ## O que ajudar a descrever
 
