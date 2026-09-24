@@ -1,0 +1,65 @@
+<section class="hero">
+  <img src="/img/icone.png" alt="" class="hero-icon" width="72" height="72" />
+  <h1>wt.ai</h1>
+  <p class="lede">
+    Conecte o ERP WinThor a qualquer assistente de IA. Configure a URL do WTA e
+    as credenciais de integração para liberar o endpoint MCP.
+  </p>
+</section>
+
+{{#if error}}
+  <div class="alert alert-error" role="alert">{{error}}</div>
+{{/if}}
+{{#if success}}
+  <div class="alert alert-ok" role="status">{{success}}</div>
+{{/if}}
+
+<form class="setup-form" method="post" action="/setup" id="setup-form">
+  <label>
+    <span>URL base do WinThor (WTA)</span>
+    <input
+      type="url"
+      name="winthorBaseUrl"
+      required
+      placeholder="http://servidor-winthor:8181"
+      value="{{defaults.winthorBaseUrl}}"
+      autocomplete="url"
+    />
+  </label>
+
+  <label>
+    <span>Login WTA</span>
+    <input
+      type="text"
+      name="login"
+      required
+      placeholder="usuario_integracao"
+      value="{{defaults.login}}"
+      autocomplete="username"
+    />
+  </label>
+
+  <label>
+    <span>Senha</span>
+    <input
+      type="password"
+      name="senha"
+      required
+      placeholder="••••••••"
+      autocomplete="current-password"
+    />
+    <small>A senha é convertida para MD5 (maiúsculo) no padrão WTA e nunca é gravada em texto plano.</small>
+  </label>
+
+  <div class="actions">
+    <button type="submit" formaction="/setup/test" formmethod="post" class="btn btn-ghost">
+      Testar conexão
+    </button>
+    <button type="submit" class="btn btn-primary">Salvar e iniciar</button>
+  </div>
+</form>
+
+<p class="hint">
+  Depois de salvar, o endpoint MCP ficará em
+  <code>{{mcpUrl}}</code>
+</p>

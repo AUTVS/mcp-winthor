@@ -1,0 +1,24 @@
+name: wtai-installer
+
+services:
+  # Constrói os instaladores dentro da imagem (ver Dockerfile) e, ao rodar,
+  # copia os artefatos validados para desktop/release/ no host.
+  #
+  #   docker compose build installer          # compila e valida
+  #   docker compose run --rm installer       # exporta os instaladores
+  #
+  # O código-fonte NÃO é montado: entra na imagem por COPY, filtrado pelo
+  # .dockerignore. O único bind mount é o diretório de saída.
+  installer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: export
+      args:
+        # Alvos do electron-builder. Ex.: TARGETS="--linux" docker compose build installer
+        TARGETS: ${TARGETS:- --win --linux}
+    # A imagem com Wine é publicada apenas para amd64. Em Apple Silicon exige
+    # Rosetta (Docker Desktop → Settings → General).
+    platform: linux/amd64
+    volumes:
+      - ./desktop/release:/export

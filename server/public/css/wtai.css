@@ -1,0 +1,875 @@
+:root {
+  --primary: #9aca3c;
+  --on-primary: #ffffff;
+  --background: #f7f8f6;
+  --surface: #383c43;
+  --border: #e8ebee;
+  --text: #414042;
+  --text-muted: #6b6e73;
+  --accent: #52770f;
+  --danger: #b42318;
+  --ok: #2f6b1a;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --shadow: rgba(46, 50, 56, 0.18) 0px 18px 48px 0px;
+  --font: "Montserrat", system-ui, sans-serif;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font);
+  color: var(--text);
+  background:
+    radial-gradient(1200px 480px at 10% -10%, rgba(154, 202, 60, 0.22), transparent 60%),
+    radial-gradient(900px 420px at 100% 0%, rgba(82, 119, 15, 0.12), transparent 55%),
+    linear-gradient(180deg, #fbfcfa 0%, var(--background) 45%, #eef1ea 100%);
+}
+
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 28px 20px 48px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.brand-logo {
+  height: 36px;
+  width: auto;
+  display: block;
+}
+
+.badge {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(154, 202, 60, 0.16);
+  border: 1px solid rgba(154, 202, 60, 0.35);
+  padding: 6px 10px;
+  border-radius: 9999px;
+}
+
+.main {
+  flex: 1;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 36px 32px;
+  animation: rise 400ms var(--ease) both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.hero-compact {
+  margin-bottom: 20px;
+}
+
+.hero-icon {
+  display: block;
+  margin: 0 auto 14px;
+}
+
+.hero h1 {
+  margin: 0 0 10px;
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  color: var(--surface);
+}
+
+.lede {
+  margin: 0 auto;
+  max-width: 38rem;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.setup-form {
+  display: grid;
+  gap: 16px;
+}
+
+.setup-form label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.setup-form small {
+  font-weight: 400;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.setup-form input {
+  font: inherit;
+  font-weight: 400;
+  font-size: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: #fff;
+  color: var(--text);
+  transition: border-color 200ms var(--ease), box-shadow 200ms var(--ease);
+}
+
+.setup-form input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(154, 202, 60, 0.25);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.btn {
+  font: inherit;
+  font-weight: 700;
+  font-size: 13px;
+  border-radius: var(--radius-md);
+  padding: 12px 18px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 200ms var(--ease), background 200ms var(--ease),
+    border-color 200ms var(--ease);
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.btn-primary:hover {
+  background: var(--accent);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.btn-ghost:hover {
+  border-color: var(--primary);
+  color: var(--accent);
+}
+
+.alert {
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  margin-bottom: 18px;
+  line-height: 1.45;
+}
+
+.alert-error {
+  background: #fef3f2;
+  color: var(--danger);
+  border: 1px solid #fecdca;
+}
+
+.alert-ok {
+  background: #f3faef;
+  color: var(--ok);
+  border: 1px solid #c8e6b0;
+}
+
+.status-ok {
+  background: #f3faef;
+  border: 1px solid #c8e6b0;
+  color: var(--ok);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  font-size: 13px;
+  margin-bottom: 22px;
+}
+
+.panel {
+  margin-bottom: 22px;
+}
+
+.panel h2 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--surface);
+}
+
+.panel p {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.mono-block,
+.code-block {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  background: #f4f5f3;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  overflow-x: auto;
+  color: var(--surface);
+  margin: 0;
+}
+
+.meta dl {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 8px 12px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.meta dt {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.meta dd {
+  margin: 0;
+}
+
+.hint {
+  margin: 22px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.hint code {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 11px;
+  background: #f4f5f3;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Painel de desconectar: presente, mas sem competir com as ações do dia a dia. */
+.panel-perigo {
+  border-color: #fecdca;
+}
+
+.btn-perigo {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+}
+
+.btn-perigo:hover:not(:disabled) {
+  background: #93150f;
+  border-color: #93150f;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn:disabled:hover {
+  transform: none;
+}
+
+.logout-label {
+  display: block;
+  margin: 14px 0 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.logout-linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.logout-input {
+  font: inherit;
+  font-size: 13px;
+  padding: 11px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--surface);
+  min-width: 180px;
+  flex: 1 1 180px;
+}
+
+.logout-input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+
+/*
+ * Grade de clientes MCP.
+ *
+ * `auto-fit` com `minmax` em vez de número fixo de colunas: reflui sozinho, sem
+ * media query.
+ *
+ * O piso de 140px não é estética, é aritmética: o painel tem 614px medidos, e
+ * com 3 vãos de 12px sobram 144,5px por coluna para caber as quatro em uma
+ * linha. Com 150px cabiam só três, e o ChatGPT descia sozinho para a segunda
+ * fila — a assimetria que motivou virar grade. Apertando a janela, o mesmo
+ * cálculo cai para 2x2 e depois para uma coluna.
+ */
+.mcp-clients {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+/*
+ * O ladrilho é o próprio <button> — e não um card com botão dentro. A área
+ * clicável passa a ser o alvo inteiro, que é o que o usuário já tenta acertar,
+ * e some a ambiguidade de ter dois alvos por cliente.
+ */
+.mcp-client-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 12px;
+  background: #fafbf9;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: center;
+  transition: transform 200ms var(--ease), border-color 200ms var(--ease),
+    background 200ms var(--ease), box-shadow 200ms var(--ease);
+}
+
+.mcp-client-tile:hover:not([disabled]) {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+  background: #ffffff;
+  box-shadow: rgba(46, 50, 56, 0.1) 0px 6px 18px 0px;
+}
+
+.mcp-client-tile:active:not([disabled]) {
+  transform: translateY(0);
+}
+
+/* Teclado precisa do mesmo destaque do mouse: o foco não pode ser invisível. */
+.mcp-client-tile:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Enquanto a requisição corre, o ladrilho fica claramente inerte. */
+.mcp-client-tile[disabled] {
+  opacity: 0.55;
+  cursor: progress;
+  transform: none;
+}
+
+.mcp-client-icon {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  /* Ícone é decorativo: o nome ao lado já diz o cliente. */
+  pointer-events: none;
+}
+
+.mcp-client-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--surface);
+  line-height: 1.25;
+}
+
+/*
+ * O caminho do arquivo em fonte mono e menor: informação de conferência, não de
+ * leitura. `break-all` porque caminho longo não tem onde quebrar sem estourar a
+ * coluna da grade.
+ */
+.mcp-client-path {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+  line-height: 1.35;
+  word-break: break-all;
+}
+
+.mcp-snippet {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/*
+ * Um único bloco de JSON manual para os quatro clientes, em vez de quatro
+ * <details> soltos entre os cartões: fechado, some do caminho; aberto, os
+ * quatro ficam lado a lado para comparação.
+ */
+.mcp-snippet-manual {
+  margin-top: 18px;
+}
+
+.mcp-snippet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.mcp-snippet-grid h4 {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--surface);
+}
+
+.mcp-snippet summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.mcp-snippet .code-block {
+  margin-top: 8px;
+}
+
+.mcp-config-status {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.mcp-config-status--loading {
+  background: #f4f5f3;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.mcp-config-status--ok {
+  background: #f3faef;
+  border: 1px solid #c8e6b0;
+  color: var(--ok);
+}
+
+.mcp-config-status--error {
+  background: #fef3f2;
+  border: 1px solid #fecdca;
+  color: var(--danger);
+}
+
+.mcp-config-status p {
+  margin: 0;
+}
+
+.mcp-config-path {
+  margin-top: 6px !important;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 11px;
+  word-break: break-all;
+}
+
+/* Barra de períodos cacheados na base local de vendas. */
+.vendas-periodos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin: 14px 0 16px;
+}
+
+.vendas-periodos-loading {
+  grid-column: 1 / -1;
+  font-size: 13px;
+  color: var(--text-muted);
+  padding: 10px 0;
+}
+
+.vendas-periodo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: #fafbf9;
+  min-height: 72px;
+}
+
+.vendas-periodo--completo {
+  border-color: #c8e6b0;
+  background: #f3faef;
+}
+
+.vendas-periodo--parcial {
+  border-color: #f5d78e;
+  background: #fffbf0;
+}
+
+.vendas-periodo--vazio {
+  border-color: var(--border);
+  background: #f4f5f3;
+  opacity: 0.85;
+}
+
+.vendas-periodo-rotulo {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--surface);
+  line-height: 1.25;
+}
+
+.vendas-periodo-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.vendas-periodo-estado {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.vendas-periodo--completo .vendas-periodo-estado {
+  color: var(--ok);
+}
+
+.vendas-periodo--parcial .vendas-periodo-estado {
+  color: #9a6b00;
+}
+
+.vendas-periodo--vazio .vendas-periodo-estado {
+  color: var(--text-muted);
+}
+
+/* Texto só para leitor de tela — região de anúncio do sync. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Barra de preenchimento da zona: "parcial" precisa ser legível de relance. */
+.vendas-periodo-barra {
+  height: 4px;
+  border-radius: 9999px;
+  background: rgba(56, 60, 67, 0.12);
+  overflow: hidden;
+}
+
+.vendas-periodo-barra > i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--text-muted);
+}
+
+.vendas-periodo--completo .vendas-periodo-barra > i {
+  background: var(--ok);
+}
+
+.vendas-periodo--parcial .vendas-periodo-barra > i {
+  background: #d9a520;
+}
+
+/* Rodapé do card: nomeia o botão que preenche a zona. */
+.vendas-periodo-acao {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* Cobertura indisponível: diz o que houve em vez de sumir com a região. */
+.vendas-aviso {
+  grid-column: 1 / -1;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid #fecdca;
+  border-left-width: 3px;
+  background: #fef3f2;
+}
+
+.vendas-aviso p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--danger);
+}
+
+.vendas-aviso .vendas-aviso-detalhe {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Régua de cobertura mês a mês. */
+.vendas-meses {
+  margin: 0 0 16px;
+}
+
+.vendas-meses-titulo {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.vendas-ano {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.vendas-ano-rotulo {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.vendas-ano-meses {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vendas-mes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: #f4f5f3;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.vendas-mes--completo {
+  border-color: #c8e6b0;
+  background: #f3faef;
+  color: var(--ok);
+}
+
+.vendas-mes--parcial {
+  border-color: #f5d78e;
+  background: #fffbf0;
+  color: #9a6b00;
+}
+
+.vendas-mes--vazio {
+  opacity: 0.75;
+}
+
+/* Mês futuro mantém o slot para a grade dos doze meses não desalinhar. */
+.vendas-mes--futuro {
+  visibility: hidden;
+}
+
+.vendas-meses-legenda {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.vendas-meses-legenda .vendas-mes {
+  width: 16px;
+  height: 12px;
+  margin-left: 6px;
+}
+
+.vendas-sync-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vendas-sync-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.vendas-sync-status {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.vendas-sync-status--running {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.vendas-sync-status--error {
+  color: var(--danger);
+}
+
+.vendas-sync-log {
+  margin-top: 12px;
+  font-size: 12px;
+}
+
+.vendas-sync-log summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--accent);
+  user-select: none;
+}
+
+.vendas-sync-log-lista {
+  margin: 10px 0 0;
+  padding: 10px 12px 10px 28px;
+  max-height: 220px;
+  overflow-y: auto;
+  list-style: none;
+  background: #f4f5f3;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.vendas-sync-log-linha {
+  display: flex;
+  gap: 10px;
+  padding: 4px 0;
+  line-height: 1.4;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.vendas-sync-log-linha:last-child {
+  border-bottom: none;
+}
+
+.vendas-sync-log-linha time {
+  flex: none;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 10.5px;
+  color: var(--text-muted);
+  opacity: 0.85;
+}
+
+.vendas-sync-log-linha--ok span {
+  color: var(--ok);
+}
+
+.vendas-sync-log-linha--warn span {
+  color: #9a6b00;
+}
+
+.vendas-sync-log-linha--error span {
+  color: var(--danger);
+}
+
+.footer {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+@media (max-width: 560px) {
+  .main {
+    padding: 28px 18px;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .meta dl {
+    grid-template-columns: 1fr;
+  }
+
+  .vendas-sync-actions .btn {
+    width: 100%;
+  }
+
+  .vendas-ano-meses {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}

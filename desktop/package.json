@@ -1,0 +1,23 @@
+{
+  "name": "wt.ai-desktop",
+  "version": "0.1.1",
+  "description": "wt.ai desktop app for macOS and Windows",
+  "private": true,
+  "main": "dist/main.js",
+  "author": "",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node scripts/copy-assets.mjs",
+    "build:server": "cd ../server && npm run build",
+    "dev": "npm run build:server && npm run build && electron .",
+    "dist:mac": "npm run build:server && npm run build && electron-builder --config electron-builder.yml --mac",
+    "dist:win": "npm run build:server && npm run build && electron-builder --config electron-builder.yml --win",
+    "dist": "npm run build:server && npm run build && electron-builder --config electron-builder.yml --mac --win"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "electron": "^35.0.0",
+    "electron-builder": "^25.1.8",
+    "typescript": "^5.7.3"
+  }
+}

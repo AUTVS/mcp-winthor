@@ -1,0 +1,41 @@
+# Contexto de build do instalador. Tudo que não é estritamente necessário para
+# compilar e empacotar fica de fora — em especial credenciais e estado local,
+# que assim nem chegam ao daemon do Docker.
+
+# Credenciais e configuração local
+**/.env
+**/.env.*
+server/data/
+!server/data/.gitkeep
+
+# Dependências e saídas de build: reinstaladas/regeneradas dentro da imagem
+**/node_modules/
+server/dist/
+desktop/dist/
+desktop/release/
+server/coverage/
+
+# Testes (não entram no pacote)
+server/test/
+**/*.spec.ts
+
+# Documentação e material de apoio
+docs/
+assets/
+*.md
+desktop/build/icon.iconset/
+
+# Metadados de ferramentas e do editor
+.git/
+.github/
+.claude/
+.mcp.json
+.DS_Store
+**/.DS_Store
+.idea/
+.vscode/
+*.log
+
+# Os próprios arquivos de build não fazem parte da imagem
+docker-compose.yml
+build-installer.sh

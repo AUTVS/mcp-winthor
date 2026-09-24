@@ -1,0 +1,72 @@
+appId: ai.wt.desktop
+productName: wt.ai
+copyright: Copyright © wt.ai
+
+directories:
+  output: release
+  buildResources: build
+
+# Source maps e declarações de tipo permitem reconstruir o código original:
+# ficam fora do pacote em qualquer plataforma, inclusive no build nativo do mac.
+files:
+  - dist/**/*
+  - '!dist/**/*.map'
+  - '!dist/**/*.d.ts'
+  - '!dist/**/*.tsbuildinfo'
+  - package.json
+  # Ícones da janela e da bandeja. Sem isto, resolveIconPath não acha nada no
+  # pacote e a bandeja sobe com o ícone em branco.
+  - build/icon.png
+  - build/icon-512.png
+  - build/icon.iconset/icon_16x16.png
+  - build/icon.iconset/icon_16x16@2x.png
+
+# nativeImage.createFromPath lê pelo lado nativo e não enxerga caminhos dentro
+# do asar de forma confiável — os ícones precisam ficar desempacotados.
+asarUnpack:
+  - build/**
+
+extraResources:
+  - from: ../server/dist
+    to: server/dist
+    filter:
+      - '**/*'
+      - '!**/*.map'
+      - '!**/*.d.ts'
+      - '!**/*.tsbuildinfo'
+  - from: ../server/views
+    to: server/views
+  - from: ../server/public
+    to: server/public
+  - from: ../server/node_modules
+    to: server/node_modules
+    filter:
+      - '**/*'
+      - '!**/*.map'
+  - from: ../server/package.json
+    to: server/package.json
+
+mac:
+  category: public.app-category.developer-tools
+  target:
+    - dmg
+    - zip
+  icon: build/icon.icns
+
+win:
+  target:
+    - nsis
+  icon: build/icon-512.png
+
+linux:
+  target:
+    - AppImage
+  icon: build/icon-512.png
+  category: Development
+  synopsis: Servidor MCP que conecta o ERP WinThor a assistentes de IA
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+
+asar: true

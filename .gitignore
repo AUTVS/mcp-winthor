@@ -1,0 +1,31 @@
+.DS_Store
+.idea
+.vscode
+*.swp
+*.log
+
+# server runtime
+server/node_modules/
+server/dist/
+server/coverage/
+server/.env
+server/data/config.json
+server/data/mcp-test-home/
+# bases locais de vendas e estoque (-wal e -shm nascem ao lado)
+server/data/vendas.db*
+server/data/vendas-meta.db*
+server/data/vendas-fato.duckdb*
+server/data/estoque-meta.db*
+server/data/estoque-fato.duckdb*
+# backup manual tirado antes de migração de schema
+server/data.bak/
+graphify-out/
+
+
+
+# desktop
+desktop/node_modules/
+desktop/dist/
+desktop/release/
+desktop/build/icon.iconset/
+server/data/vendas-fato_old.duckdb

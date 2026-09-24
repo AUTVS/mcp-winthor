@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="ChatGPT">
+  <!-- ChatGPT: laço hexagonal entrelaçado, simplificado em traço.
+       Substituível pelo SVG oficial. -->
+  <g fill="none" stroke="#10a37f" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M24 8.4 37.5 16.2v15.6L24 39.6 10.5 31.8V16.2Z"/>
+    <path d="M24 8.4v15.6l13.5 7.8"/>
+    <path d="M24 24 10.5 31.8"/>
+  </g>
+  <circle cx="24" cy="24" r="3" fill="#10a37f"/>
+</svg>

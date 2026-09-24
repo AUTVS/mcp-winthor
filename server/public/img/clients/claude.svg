@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Claude">
+  <!-- Marca simplificada do Claude: rajada radial. Substituível pelo SVG oficial. -->
+  <g fill="#d97757">
+    <rect x="22.1" y="4" width="3.8" height="15" rx="1.9"/>
+    <rect x="22.1" y="29" width="3.8" height="15" rx="1.9"/>
+    <rect x="4" y="22.1" width="15" height="3.8" rx="1.9"/>
+    <rect x="29" y="22.1" width="15" height="3.8" rx="1.9"/>
+    <rect x="22.1" y="6" width="3.8" height="14" rx="1.9" transform="rotate(30 24 24)"/>
+    <rect x="22.1" y="28" width="3.8" height="14" rx="1.9" transform="rotate(30 24 24)"/>
+    <rect x="22.1" y="6" width="3.8" height="14" rx="1.9" transform="rotate(60 24 24)"/>
+    <rect x="22.1" y="28" width="3.8" height="14" rx="1.9" transform="rotate(60 24 24)"/>
+    <rect x="22.1" y="6" width="3.8" height="14" rx="1.9" transform="rotate(120 24 24)"/>
+    <rect x="22.1" y="28" width="3.8" height="14" rx="1.9" transform="rotate(120 24 24)"/>
+    <rect x="22.1" y="6" width="3.8" height="14" rx="1.9" transform="rotate(150 24 24)"/>
+    <rect x="22.1" y="28" width="3.8" height="14" rx="1.9" transform="rotate(150 24 24)"/>
+  </g>
+</svg>

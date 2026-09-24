@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Cursor">
+  <!-- Cursor: cubo isométrico de três faces. Substituível pelo SVG oficial. -->
+  <path d="M24 4 44 15.2v21.6L24 48 4 36.8V15.2Z" fill="#26282d"/>
+  <path d="M24 4 44 15.2 24 26.4 4 15.2Z" fill="#6f747d"/>
+  <path d="M24 26.4 44 15.2v21.6L24 48Z" fill="#3f434a"/>
+  <path d="M24 26.4 4 15.2v21.6L24 48Z" fill="#1c1e22"/>
+  <path d="M24 4v22.4l20-11.2Z" fill="#9aa0a8"/>
+</svg>

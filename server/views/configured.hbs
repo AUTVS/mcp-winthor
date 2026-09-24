@@ -1,0 +1,174 @@
+<section class="hero hero-compact">
+  <img src="/img/icone.png" alt="" class="hero-icon" width="64" height="64" />
+  <h1>Pronto para usar</h1>
+  <p class="lede">
+    O wt.ai está configurado e o endpoint MCP está disponível para o seu cliente.
+  </p>
+</section>
+
+<div class="status-ok" role="status">
+  Conectado a <strong>{{config.winthorBaseUrl}}</strong> como
+  <strong>{{config.login}}</strong>
+</div>
+
+<section class="panel">
+  <h2>Endpoint MCP</h2>
+  <p class="mono-block">{{mcpUrl}}</p>
+</section>
+
+<section class="panel" id="vendas-cache-panel">
+  <h2>Base local de vendas</h2>
+  <p>
+    Cache local dos pedidos do WinThor usados nas consultas.
+    <strong>Atualizar cache</strong> recarrega a janela que o WinThor ainda
+    reconstrói de forma exata — do 1º do mês anterior até hoje.
+    <strong>Sync histórico</strong> varre o ano atual e o anterior.
+  </p>
+
+  {{!-- Sem role/aria-live: esta região é reconstruída a cada poll (1,5 s durante a
+        sincronização) e um leitor de tela releria os cards inteiros sem parar. A
+        região viva do painel é #vendas-sync-anuncio, lá embaixo. --}}
+  <div class="vendas-periodos" id="vendas-zonas">
+    <p class="vendas-periodos-loading">Carregando cobertura…</p>
+  </div>
+
+  <section class="vendas-meses" id="vendas-meses" aria-labelledby="vendas-meses-titulo" hidden>
+    <h3 class="vendas-meses-titulo" id="vendas-meses-titulo">Cobertura por mês</h3>
+    <div id="vendas-meses-anos"></div>
+    <p class="vendas-meses-legenda">
+      <span class="vendas-mes vendas-mes--completo" aria-hidden="true"></span> Cacheado
+      <span class="vendas-mes vendas-mes--parcial" aria-hidden="true"></span> Parcial
+      <span class="vendas-mes vendas-mes--vazio" aria-hidden="true"></span> Sem cache
+    </p>
+  </section>
+
+  <div class="vendas-sync-bar">
+    <div class="vendas-sync-actions">
+      <button type="button" class="btn btn-primary" id="vendas-sync-atualizacao"
+              aria-describedby="vendas-zona-atualizacao">
+        Atualizar cache
+      </button>
+      <button type="button" class="btn btn-ghost" id="vendas-sync-historico"
+              aria-describedby="vendas-zona-historico">
+        Sync histórico
+      </button>
+      <button type="button" class="btn btn-ghost" id="vendas-sync-cancelar" hidden>
+        Cancelar
+      </button>
+    </div>
+    <p class="vendas-sync-status" id="vendas-sync-status" hidden></p>
+    <details class="vendas-sync-log" id="vendas-sync-log-panel" hidden>
+      <summary>Log da sincronização</summary>
+      <ol class="vendas-sync-log-lista" id="vendas-sync-log" aria-live="off"></ol>
+    </details>
+    {{!-- Única região viva do painel: só recebe texto em transição de estado. --}}
+    <p class="visually-hidden" id="vendas-sync-anuncio" role="status" aria-live="polite"></p>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Configurar cliente MCP</h2>
+  <p>Clique para adicionar o wt.ai ao arquivo de configuração do cliente.</p>
+
+  <div class="mcp-clients">
+    <button type="button" class="mcp-client-tile mcp-config-btn" data-client="cursor">
+      <img src="/img/clients/cursor.svg" alt="" class="mcp-client-icon" width="40" height="40" />
+      <span class="mcp-client-name">Cursor</span>
+      <span class="mcp-client-path">~/.cursor/mcp.json</span>
+    </button>
+
+    <button type="button" class="mcp-client-tile mcp-config-btn" data-client="claude-desktop">
+      <img src="/img/clients/claude.svg" alt="" class="mcp-client-icon" width="40" height="40" />
+      <span class="mcp-client-name">Claude Desktop</span>
+      <span class="mcp-client-path">claude_desktop_config.json</span>
+    </button>
+
+    <button type="button" class="mcp-client-tile mcp-config-btn" data-client="claude-code">
+      <img src="/img/clients/claude-code.svg" alt="" class="mcp-client-icon" width="40" height="40" />
+      <span class="mcp-client-name">Claude Code</span>
+      <span class="mcp-client-path">~/.claude.json</span>
+    </button>
+
+    <button type="button" class="mcp-client-tile mcp-config-btn" data-client="chatgpt">
+      <img src="/img/clients/chatgpt.svg" alt="" class="mcp-client-icon" width="40" height="40" />
+      <span class="mcp-client-name">ChatGPT</span>
+      <span class="mcp-client-path">OpenAI/ChatGPT/config.json</span>
+    </button>
+  </div>
+
+  <div id="mcp-config-status" class="mcp-config-status" hidden role="status"></div>
+
+  <details class="mcp-snippet mcp-snippet-manual">
+    <summary>Ver JSON manual</summary>
+    <div class="mcp-snippet-grid">
+      <div>
+        <h4>Cursor</h4>
+        <pre class="code-block"><code>{{snippets.cursor}}</code></pre>
+      </div>
+      <div>
+        <h4>Claude Desktop</h4>
+        <pre class="code-block"><code>{{snippets.claudeDesktop}}</code></pre>
+      </div>
+      <div>
+        <h4>Claude Code</h4>
+        <pre class="code-block"><code>{{snippets.claudeCode}}</code></pre>
+      </div>
+      <div>
+        <h4>ChatGPT</h4>
+        <pre class="code-block"><code>{{snippets.chatgpt}}</code></pre>
+      </div>
+    </div>
+  </details>
+</section>
+
+<section class="panel meta">
+  <h2>Configuração atual</h2>
+  <dl>
+    <dt>URL base</dt>
+    <dd>{{config.winthorBaseUrl}}</dd>
+    <dt>Login</dt>
+    <dd>{{config.login}}</dd>
+    <dt>Configurado em</dt>
+    <dd>{{config.configuredAt}}</dd>
+  </dl>
+</section>
+
+{{!-- Ação destrutiva em dois passos, e não um confirm() de uma tecla: um clique
+      acidental aqui derruba o login salvo e manda o usuário de volta ao wizard. --}}
+<section class="panel panel-perigo" id="logout-panel">
+  <h2>Desconectar</h2>
+  <p>
+    Apaga o login salvo e volta ao assistente de configuração. A base local de
+    vendas <strong>não</strong> é apagada — reconfigurando com o mesmo servidor e
+    login, os pedidos já baixados continuam valendo.
+  </p>
+
+  <button type="button" class="btn btn-ghost" id="logout-iniciar">
+    Desconectar…
+  </button>
+
+  <form method="post" action="/setup/reset" id="logout-form" hidden>
+    <label class="logout-label" for="logout-confirmacao">
+      Para confirmar, digite o login <strong>{{config.login}}</strong>:
+    </label>
+    <div class="logout-linha">
+      <input
+        type="text"
+        id="logout-confirmacao"
+        class="logout-input"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+        data-login="{{config.login}}"
+      />
+      <button type="submit" class="btn btn-perigo" id="logout-confirmar" disabled>
+        Desconectar
+      </button>
+      <button type="button" class="btn btn-ghost" id="logout-cancelar">
+        Cancelar
+      </button>
+    </div>
+  </form>
+</section>
+
+<script src="/js/configured.js"></script>
