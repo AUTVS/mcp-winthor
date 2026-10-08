@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>mcp-winthor (wt.ai) — Servidor MCP para WinThor — AUTVS</title>
+<meta name="description" content="Servidor MCP local que liga o ERP WinThor a assistentes de IA (Cursor, Claude, ChatGPT): NestJS, base analítica local em DuckDB, aplicativo desktop em Electron e instalador, com credenciais que não saem da máquina do usuário.">
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#0e1b2e;--ink2:#506078;--line:#dde5ef;--ac:#285c83;--ac2:#3b82b6;--ok:#17714a;--okb:#e1f4ea;--wr:#8a5a00;--wrb:#fff1cf;--bd:#b3261e;--bdb:#fde6e3;--cb:#eef2f8;--hero1:#0f2742;--hero2:#285c83}
+@media(prefers-color-scheme:dark){:root:not([data-t=light]){--bg:#0b1320;--card:#131e30;--ink:#e7eef8;--ink2:#9db0c8;--line:#243350;--ac:#6db4e6;--ac2:#8cc6f0;--ok:#5fd29a;--okb:#0f2e20;--wr:#f0c15a;--wrb:#38290a;--bd:#ff8a80;--bdb:#3a1613;--cb:#0e1829;--hero1:#08121f;--hero2:#16405f}}
+:root[data-t=dark]{--bg:#0b1320;--card:#131e30;--ink:#e7eef8;--ink2:#9db0c8;--line:#243350;--ac:#6db4e6;--ac2:#8cc6f0;--ok:#5fd29a;--okb:#0f2e20;--wr:#f0c15a;--wrb:#38290a;--bd:#ff8a80;--bdb:#3a1613;--cb:#0e1829;--hero1:#08121f;--hero2:#16405f}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--ac)}
+.hero{background:linear-gradient(135deg,var(--hero1),var(--hero2));color:#fff;padding:34px 16px 30px}
+.hero .in{max-width:1180px;margin:0 auto}
+.hero small{letter-spacing:.14em;text-transform:uppercase;opacity:.8;font-size:12px}
+.hero h1{margin:8px 0 6px;font-size:clamp(24px,4vw,38px);line-height:1.15}
+.hero p{margin:6px 0;max-width:860px;opacity:.93}
+.hero .tags .tag{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.25)}
+.lay{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;padding:20px 16px 80px}
+nav.toc{position:sticky;top:12px;align-self:start;max-height:calc(100vh - 24px);overflow:auto;font-size:13.5px}
+nav.toc a{display:block;padding:5px 10px;border-left:3px solid var(--line);color:var(--ink2);text-decoration:none}
+nav.toc a.on{border-color:var(--ac);color:var(--ac);font-weight:600;background:var(--card)}
+nav.toc .tb{display:flex;gap:6px;margin-bottom:10px}
+main h2{margin:38px 0 12px;font-size:22px;padding-left:12px;border-left:4px solid var(--ac)}
+main h3{margin:22px 0 6px;font-size:16.5px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:12px 0}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.kpi b{display:block;font-size:24px;color:var(--ac)}.kpi span{color:var(--ink2);font-size:13px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.tag{display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;background:var(--cb);color:var(--ac);border:1px solid var(--line)}
+.tw{overflow-x:auto;margin:10px 0}
+table{width:100%;border-collapse:collapse;font-size:14px;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+th,td{text-align:left;padding:8px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--cb);color:var(--ink2);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+tr:last-child td{border-bottom:0}
+code{font-family:ui-monospace,Consolas,monospace;font-size:12.8px;background:var(--cb);padding:1px 6px;border-radius:5px}
+.cmd{position:relative;background:var(--cb);border:1px solid var(--line);border-radius:10px;margin:10px 0}
+.cmd pre{margin:0;padding:12px 76px 12px 14px;overflow-x:auto;font:12.8px/1.55 ui-monospace,Consolas,monospace;white-space:pre}
+button{background:var(--ac);color:#fff;border:0;border-radius:7px;padding:5px 11px;font-size:12px;cursor:pointer}
+.cmd button{position:absolute;top:8px;right:8px}
+button.sec{background:transparent;color:var(--ac);border:1px solid var(--ac)}
+.note{border-left:4px solid var(--wr);background:var(--wrb);padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0}
+.note.bad{border-color:var(--bd);background:var(--bdb)}.note.ok{border-color:var(--ok);background:var(--okb)}
+details{background:var(--card);border:1px solid var(--line);border-radius:10px;margin:10px 0;padding:0 16px}
+summary{cursor:pointer;padding:11px 0;font-weight:600}
+details[open] summary{border-bottom:1px solid var(--line);margin-bottom:10px}
+.eq{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.eq .p{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--ac);border-radius:12px;padding:14px 16px}
+.eq .p b{display:block;font-size:14.5px}.eq .p i{display:block;font-style:normal;color:var(--ac);font-weight:600;font-size:13px;margin:2px 0 6px}
+.eq .p p{margin:0;font-size:13.5px;color:var(--ink2)}
+.busca{width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);margin:6px 0}
+footer{border-top:1px solid var(--line);margin-top:44px;padding-top:14px;color:var(--ink2);font-size:13px}
+svg text{font-family:system-ui,sans-serif}
+@media(max-width:860px){.lay{grid-template-columns:minmax(0,1fr);gap:12px}.lay>*{min-width:0}nav.toc{position:static;max-height:none;display:flex;flex-wrap:wrap;gap:4px}nav.toc .tb{width:100%}nav.toc a{border:1px solid var(--line);border-radius:99px;white-space:normal}}
+@media print{nav.toc,button,.busca{display:none}.lay{display:block}details{border:0}body{background:#fff;color:#000}.hero{color:#000;background:#fff;border-bottom:2px solid #000}}
+</style></head><body>
+<header class="hero"><div class="in"><small>AUTVS · Relatório técnico do repositório mcp-winthor</small><h1>mcp-winthor (wt.ai) — Servidor MCP para WinThor</h1><p>Servidor MCP local que liga o ERP WinThor a assistentes de IA (Cursor, Claude, ChatGPT): NestJS, base analítica local em DuckDB, aplicativo desktop em Electron e instalador, com credenciais que não saem da máquina do usuário.</p><p class="tags"><span class="tag">MCP</span><span class="tag">NestJS</span><span class="tag">TypeScript</span><span class="tag">DuckDB</span><span class="tag">Electron</span><span class="tag">Zod</span><span class="tag">Docker (instalador)</span><span class="tag">MIT</span></p></div></header>
+<div class="lay"><nav class="toc"><div class="tb"><button class="sec" onclick="tema()">Tema</button><button class="sec" onclick="print()">Imprimir</button></div><a href="#visao">1. Visão geral</a><a href="#destaques">2. Destaques de engenharia</a><a href="#stack">3. Stack tecnológica</a><a href="#arvore">4. Estrutura do repositório</a><a href="#build">5. Compilar, testar e executar</a><a href="#deploy">6. Produção e deploy</a><a href="#env">7. Variáveis de ambiente</a><a href="#obs">8. Observações importantes</a><a href="#rel">9. Repositórios relacionados</a><a href="#equipe">10. Equipe</a></nav>
+<main><h2 id="visao">1. Visão geral</h2><p>O <b>wt.ai</b> sobe na máquina do usuário, recebe a URL e as credenciais do WinThor numa interface local e expõe <b>tools MCP</b> (<code>wt_*</code>) a qualquer cliente compatível. Consultas pesadas de vendas e estoque leem uma <b>base local</b> (DuckDB, ingerida do WinThor); o restante vai direto à API do WinThor. Em vez de exportar planilha, o usuário pergunta ao assistente de IA.</p><div class="grid"><div class="kpi"><b>2</b><span>commits</span></div><div class="kpi"><b>137</b><span>arquivos versionados</span></div><div class="kpi"><b>24/09 → 24/09</b><span>período de atividade (2026)</span></div><div class="kpi"><b>≈18 mil</b><span>linhas de TypeScript</span></div><div class="kpi"><b>MIT</b><span>licença</span></div><div class="kpi"><b>v0.1.1</b><span>versão</span></div></div><h2 id="destaques">2. Destaques de engenharia</h2><ul><li><b>Padrão MCP:</b> servidor via <code>@modelcontextprotocol/server</code> em HTTP (<code>/mcp</code>), com tools agrupadas (servidor, vendas, estoque, financeiro, clientes…).</li><li><b>Arquitetura local-first:</b> credenciais e dados ficam na máquina; ingestão para DuckDB acelera consultas analíticas e paginação.</li><li><b>NestJS modular</b> com validação (class-validator, Zod), UI local em Handlebars e testes unitários e e2e (autenticação, ingestão, paginação, contrato HTTP).</li><li><b>Distribuição:</b> app desktop Electron (electron-builder) e <code>build-installer.sh</code> que empacota via Docker.</li></ul><h2 id="stack">3. Stack tecnológica</h2><div class="tw"><table><thead><tr><th>Camada</th><th>Tecnologia</th><th>Uso</th></tr></thead><tbody><tr><td>Servidor</td><td>NestJS · Express · TypeScript · RxJS</td><td>API local e MCP</td></tr><tr><td>MCP</td><td>@modelcontextprotocol/server e /node</td><td>Protocolo das tools</td></tr><tr><td>Dados</td><td>@duckdb/node-api</td><td>Base analítica local</td></tr><tr><td>Desktop</td><td>Electron · electron-builder</td><td>Aplicativo e instalador</td></tr><tr><td>Validação</td><td>Zod · class-validator</td><td>Entradas e contratos</td></tr></tbody></table></div><h2 id="arvore">4. Estrutura do repositório</h2><details open><summary>Árvore versionada</summary><div class="cmd"><pre>mcp-winthor/   (124 arquivos versionados)
+├── desktop/
+│   ├── build/   … 1 arquivos
+│   ├── scripts/   … 1 arquivos
+│   ├── src/   … 8 arquivos
+│   ├── electron-builder.yml
+│   ├── package-lock.json
+│   ├── package.json
+│   └── tsconfig.json
+├── docs/
+│   ├── arquitetura.md
+│   ├── casos-de-uso.md
+│   └── contato.md
+├── scripts/
+│   └── verify-artifacts.sh
+├── server/
+│   ├── data/   … 1 arquivos
+│   ├── public/   … 2 arquivos
+│   ├── scripts/   … 1 arquivos
+│   ├── src/   … 76 arquivos
+│   ├── test/   … 3 arquivos
+│   ├── views/   … 3 arquivos
+│   ├── .env.example
+│   ├── .gitignore
+│   ├── .prettierrc
+│   ├── eslint.config.mjs
+│   ├── inspector.config.json
+│   ├── nest-cli.json
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── README.md
+│   ├── tsconfig.build.json
+│   └── tsconfig.json
+├── .dockerignore
+├── .gitignore
+├── .mcp.json
+├── build-installer.sh
+├── CONTRIBUTING.md
+├── docker-compose.yml
+├── Dockerfile
+├── LICENSE
+└── README.md</pre><button onclick="copiar(this)">Copiar</button></div></details><div class="tw"><table><thead><tr><th>Pasta / arquivo</th><th>Responsabilidade</th></tr></thead><tbody><tr><td><code>server</code></td><td>Servidor NestJS (src, views, public, test, scripts)</td></tr><tr><td><code>desktop</code></td><td>Aplicativo Electron</td></tr><tr><td><code>docs</code></td><td>Casos de uso, arquitetura e contato</td></tr><tr><td><code>build-installer.sh · Dockerfile · docker-compose.yml</code></td><td>Empacotamento do instalador</td></tr></tbody></table></div><h2 id="build">5. Compilar, testar e executar</h2><div class="cmd"><pre># servidor (desenvolvimento)
+cd server
+cp .env.example .env
+npm install
+npm run start:dev      # http://127.0.0.1:8787  (MCP em /mcp)
+npm test &amp;&amp; npm run test:e2e
+
+# desktop
+cd ../desktop
+npm install &amp;&amp; npm run dev
+
+# instalador (via Docker)
+./build-installer.sh</pre><button onclick="copiar(this)">Copiar</button></div><h2 id="deploy">6. Produção e deploy</h2><ul><li>Distribuído como <b>instalador desktop</b> (Electron); não roda no Coolify.</li><li>Cada usuário aponta o cliente MCP para o servidor local (<code>http://127.0.0.1:8787/mcp</code>).</li></ul><h2 id="env">7. Variáveis de ambiente</h2><p>Este repositório não usa variáveis de ambiente.</p><h2 id="obs">8. Observações importantes</h2><ul><li>Credenciais do WinThor ficam locais; nunca versione o <code>.env</code> do servidor.</li><li>Documentação: <code>docs/arquitetura.md</code> e <code>docs/casos-de-uso.md</code>.</li></ul><h2 id="rel">9. Repositórios relacionados</h2><div class="tw"><table><thead><tr><th>Repositório</th><th>Papel</th></tr></thead><tbody><tr><td><a href="https://github.com/AUTVS/autvs_api">autvs_api</a></td><td>Backend .NET 10 (geração 2): regras de negócio, autenticação, Oracle/Postgres</td></tr><tr><td><a href="https://github.com/AUTVS/autvs_app">autvs_app</a></td><td>Frontend Next.js 16 (geração 2) com BFF; consome a autvs_api</td></tr><tr><td><a href="https://github.com/AUTVS/autvs_api_assistant">autvs_api_assistant</a></td><td>AUTVS Assistant: agente de IA com ferramentas tipadas somente leitura</td></tr><tr><td><a href="https://github.com/AUTVS/autvs_app_legacy">autvs_app_legacy</a></td><td>Geração 1 em Next.js 14: especificação de funcionamento e dono do schema do Postgres</td></tr><tr><td><a href="https://github.com/AUTVS/autvs_webpage">autvs_webpage</a></td><td>Site de apresentação (landing “Em breve”)</td></tr><tr><td><a href="https://github.com/AUTVS/autvs_lp">autvs_lp</a></td><td>Repositório reservado para a landing page institucional</td></tr><tr><td><a href="https://github.com/AUTVS/autvs_docs">autvs_docs</a></td><td>Documentação do ecossistema e PDFs de referência</td></tr><tr><td><a href="https://github.com/AUTVS/autvs_prompts">autvs_prompts</a></td><td>Prompts de engenharia e roteiros de execução</td></tr><tr><td><a href="https://github.com/AUTVS/autvs_sql">autvs_sql</a></td><td>SQLs, traces e modelos de relatório das rotinas do WinThor</td></tr><tr><td><a href="https://github.com/AUTVS/autvs_assets">autvs_assets</a></td><td>Marca: logos, ícones, favicons e fundos</td></tr></tbody></table></div><h2 id="equipe">10. Equipe</h2><div class="eq"><div class="p"><b>MARCOS MORAIS DE SOUSA</b><i>Idealizador · Product Owner · Gerente de Projetos</i><p>Concebeu o produto AUTVS Analytics for WinThor, define a visão, as premissas de negócio e as prioridades, e conduz o roadmap e a entrega de todo o ecossistema.</p></div><div class="p"><b>DIMITRI MATEUS REIS DE SOUSA</b><i>Principal desenvolvedor · Especialista em IA</i><p>Principal responsável pelo desenvolvimento do ecossistema, com especialização em inteligência artificial: orquestração de LLMs, ferramentas tipadas, failover de provedores e guardas de fundamentação.</p></div><div class="p"><b>DAVID REIS DE SOUSA</b><i>UI/UX · Criação da marca · Design</i><p>Responsável pela experiência e interface do usuário, pela criação da marca AUTVS e pela direção de design de todo o produto.</p></div></div>
+<footer><p>Documento gerado em 08/10/2026. Não contém segredos, senhas, chaves nem endereços internos: variáveis de ambiente aparecem apenas pelo <b>nome</b>. © MORAIS TECNOLOGIA — AUTVS Analytics for WinThor.</p></footer></main></div>
+<script>
+const T=document.documentElement;
+function tema(){const a=T.dataset.t==='dark'||(!T.dataset.t&&matchMedia('(prefers-color-scheme:dark)').matches);T.dataset.t=a?'light':'dark'}
+function copiar(b){const t=b.parentElement.querySelector('pre').innerText;const f=()=>{const o=b.textContent;b.textContent='Copiado!';setTimeout(()=>b.textContent=o,1100)};
+ if(navigator.clipboard)navigator.clipboard.writeText(t).then(f,f);else{const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();document.execCommand('copy');x.remove();f()}}
+document.querySelectorAll('input.busca').forEach(i=>i.addEventListener('input',()=>{const q=i.value.toLowerCase();i.nextElementSibling.querySelectorAll('tbody tr').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?'':'none')}));
+const links=[...document.querySelectorAll('nav.toc a[href^="#"]')];
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){links.forEach(l=>l.classList.toggle('on',l.getAttribute('href')==='#'+e.target.id))}}),{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('main h2[id]').forEach(s=>obs.observe(s));
+</script></body></html>
