@@ -1,0 +1,1318 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>wt.ai MCP WinThor — Visão e Requisitos</title>
+<meta name="description" content="Documento de visão, requisitos e diagramas do mcp-winthor (wt.ai): servidor MCP local que liga o ERP WinThor a assistentes de IA.">
+<style>
+:root{
+  --bg:#f4f7fb;--card:#fff;--ink:#0e1b2e;--ink2:#506078;--line:#dde5ef;--ac:#285c83;--ac2:#3b82b6;
+  --ok:#17714a;--okb:#e1f4ea;--wr:#8a5a00;--wrb:#fff1cf;--bd:#b3261e;--bdb:#fde6e3;--info:#1d4ed8;--infob:#e3ecff;
+  --cb:#eef2f8;--hero1:#0f2742;--hero2:#285c83;--shadow:0 1px 2px rgba(14,27,46,.06),0 6px 20px rgba(14,27,46,.05);
+  --fe:#2563eb;--be:#7c3aed;--ia:#0d9488;
+}
+@media(prefers-color-scheme:dark){:root:not([data-t=light]){
+  --bg:#0b1320;--card:#131e30;--ink:#e7eef8;--ink2:#9db0c8;--line:#243350;--ac:#6db4e6;--ac2:#8cc6f0;
+  --ok:#5fd29a;--okb:#0f2e20;--wr:#f0c15a;--wrb:#38290a;--bd:#ff8a80;--bdb:#3a1613;--info:#8db4ff;--infob:#15244a;
+  --cb:#0e1829;--hero1:#08121f;--hero2:#16405f;--shadow:0 1px 2px rgba(0,0,0,.4);
+  --fe:#6ea0ff;--be:#b79bff;--ia:#4fd1c5}}
+:root[data-t=dark]{
+  --bg:#0b1320;--card:#131e30;--ink:#e7eef8;--ink2:#9db0c8;--line:#243350;--ac:#6db4e6;--ac2:#8cc6f0;
+  --ok:#5fd29a;--okb:#0f2e20;--wr:#f0c15a;--wrb:#38290a;--bd:#ff8a80;--bdb:#3a1613;--info:#8db4ff;--infob:#15244a;
+  --cb:#0e1829;--hero1:#08121f;--hero2:#16405f;--shadow:0 1px 2px rgba(0,0,0,.4);
+  --fe:#6ea0ff;--be:#b79bff;--ia:#4fd1c5}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:20px}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--ac)}
+code{font-family:ui-monospace,Consolas,Menlo,monospace;font-size:.88em;background:var(--cb);padding:.1em .35em;border-radius:4px}
+
+/* layout */
+.shell{display:grid;grid-template-columns:272px minmax(0,1fr);min-height:100vh}
+nav.toc{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;background:var(--card);border-right:1px solid var(--line);padding:18px 14px 28px}
+nav.toc .brand{font-weight:700;font-size:15px;color:var(--ac);margin:0 6px 2px}
+nav.toc .sub{font-size:12px;color:var(--ink2);margin:0 6px 14px}
+nav.toc a{display:block;text-decoration:none;color:var(--ink2);padding:5px 10px;border-radius:8px;font-size:13.5px;line-height:1.35}
+nav.toc a:hover{background:var(--cb);color:var(--ink)}
+nav.toc a.on{background:var(--cb);color:var(--ac);font-weight:600;box-shadow:inset 3px 0 0 var(--ac)}
+nav.toc .grp{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink2);margin:14px 10px 4px;opacity:.8}
+main{min-width:0}
+.hero{background:linear-gradient(135deg,var(--hero1),var(--hero2));color:#fff;padding:44px 40px 36px}
+.hero h1{margin:0 0 6px;font-size:clamp(24px,3.4vw,36px);line-height:1.15;letter-spacing:-.01em}
+.hero p{margin:0;max-width:760px;opacity:.9}
+.hero .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chip{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid transparent}
+.hero .chip{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.25);color:#fff}
+.tools{position:fixed;right:16px;bottom:16px;display:flex;gap:8px;z-index:20}
+.tools button,.btn{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 12px;border-radius:10px;cursor:pointer;box-shadow:var(--shadow)}
+.tools button:hover,.btn:hover{border-color:var(--ac)}
+.menu-btn{display:none}
+.wrap{padding:28px 40px 80px;max-width:1120px}
+section{margin:0 0 44px}
+section>h2{font-size:23px;margin:0 0 6px;letter-spacing:-.01em;display:flex;gap:10px;align-items:baseline}
+section>h2 .n{color:var(--ac);font-variant-numeric:tabular-nums}
+section>.lead{color:var(--ink2);margin:0 0 18px;max-width:820px}
+h3{font-size:17px;margin:26px 0 8px}
+h4{font-size:14px;margin:18px 0 6px;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em}
+p{margin:0 0 12px}
+ul,ol{margin:0 0 14px;padding-left:22px}
+li{margin:3px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);margin:0 0 16px}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow)}
+.kpi b{display:block;font-size:26px;line-height:1.1;color:var(--ac);font-variant-numeric:tabular-nums}
+.kpi span{font-size:12.5px;color:var(--ink2)}
+.comp{border-top:4px solid var(--c);}
+.comp h3{margin-top:0;color:var(--c)}
+.comp.fe{--c:var(--fe)}.comp.be{--c:var(--be)}.comp.ia{--c:var(--ia)}
+.callout{border-radius:12px;padding:12px 16px;margin:0 0 16px;border:1px solid var(--line);background:var(--cb)}
+.callout.ok{background:var(--okb);border-color:transparent}
+.callout.wr{background:var(--wrb);border-color:transparent}
+.callout.bd{background:var(--bdb);border-color:transparent}
+.callout.info{background:var(--infob);border-color:transparent}
+.callout b:first-child{display:block;margin-bottom:2px}
+
+/* tabelas */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--card);margin:0 0 16px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:9px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{background:var(--cb);font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink2);position:sticky;top:0;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.id{font-family:ui-monospace,Consolas,monospace;font-weight:700;white-space:nowrap}
+.tag{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11.5px;font-weight:700;white-space:nowrap}
+.t-fe{background:var(--infob);color:var(--fe)}.t-be{background:var(--cb);color:var(--be)}.t-ia{background:var(--okb);color:var(--ia)}
+.t-must{background:var(--bdb);color:var(--bd)}.t-should{background:var(--wrb);color:var(--wr)}.t-could{background:var(--cb);color:var(--ink2)}
+.s-ok{background:var(--okb);color:var(--ok)}.s-part{background:var(--wrb);color:var(--wr)}.s-pend{background:var(--bdb);color:var(--bd)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px;align-items:center}
+.filters input,.filters select{font:inherit;font-size:13px;padding:7px 10px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:9px}
+.filters input{min-width:220px;flex:1}
+.count{font-size:12.5px;color:var(--ink2)}
+
+/* diagramas */
+figure.dg{margin:0 0 22px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+figure.dg figcaption{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:12px 16px;border-bottom:1px solid var(--line)}
+figure.dg figcaption b{font-size:14.5px}
+figure.dg figcaption small{display:block;color:var(--ink2);font-size:12.5px;margin-top:1px}
+figure.dg .stage{padding:14px;overflow:auto;text-align:center;min-height:120px}
+figure.dg .stage svg{max-width:100%;height:auto}
+figure.dg .why{padding:10px 16px;border-top:1px solid var(--line);font-size:13px;color:var(--ink2);background:var(--cb)}
+figure.dg .why b{color:var(--ink)}
+.dg-fail{color:var(--bd);font-size:13px;text-align:left}
+.dg-fail pre{white-space:pre-wrap;background:var(--cb);padding:10px;border-radius:8px;color:var(--ink)}
+.zoom{flex:none}
+dialog#zm{border:0;border-radius:14px;padding:0;width:min(1500px,96vw);height:min(92vh,980px);background:var(--card);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+dialog#zm::backdrop{background:rgba(5,10,20,.7)}
+#zm .bar{display:flex;gap:8px;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line)}
+#zm .body{height:calc(100% - 52px);overflow:auto;padding:16px;text-align:center}
+#zm .body svg{height:auto;width:auto;max-width:none;min-width:900px}
+
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0}
+.flow span.st{background:var(--cb);border:1px solid var(--line);padding:4px 10px;border-radius:8px;font-size:13px}
+.flow i{font-style:normal;color:var(--ink2)}
+.small{font-size:12.5px;color:var(--ink2)}
+footer{border-top:1px solid var(--line);padding:22px 40px;color:var(--ink2);font-size:12.5px}
+
+@media(max-width:1000px){
+  .shell{grid-template-columns:1fr}
+  nav.toc{position:fixed;inset:0 auto 0 0;width:285px;z-index:30;transform:translateX(-102%);transition:transform .2s;box-shadow:var(--shadow)}
+  nav.toc.open{transform:none}
+  .menu-btn{display:inline-block}
+  .wrap{padding:22px 16px 80px}.hero{padding:30px 16px 26px}footer{padding:18px 16px}
+  .g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:620px){.g2,.g3,.g4{grid-template-columns:1fr}}
+@media print{
+  nav.toc,.tools,.filters,.zoom{display:none!important}
+  .shell{display:block}body{background:#fff;color:#000}
+  .hero{background:#0f2742!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  section,figure.dg,.card{break-inside:avoid}
+  .wrap{max-width:none;padding:10px 0}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<nav class="toc" id="toc" aria-label="Sumário">
+  <p class="brand">mcp-winthor · wt.ai</p>
+  <p class="sub">Visão e Requisitos · v1.0 · 10/10/2026</p>
+  <div class="grp">Visão</div>
+  <a href="#resumo">1. Sumário executivo</a>
+  <a href="#visao">2. Visão do produto</a>
+  <a href="#atores">3. Atores e casos de uso</a>
+  <div class="grp">Arquitetura</div>
+  <a href="#arquitetura">4. Arquitetura geral</a>
+  <a href="#servidor">5. Servidor MCP</a>
+  <a href="#dados-locais">6. Ingestão e base local</a>
+  <a href="#desktop">7. App desktop</a>
+  <div class="grp">Requisitos</div>
+  <a href="#rf">8. Requisitos funcionais</a>
+  <a href="#rnf">9. Requisitos não funcionais</a>
+  <a href="#rn">10. Regras de negócio</a>
+  <div class="grp">Comportamento</div>
+  <a href="#fluxos">11. Fluxos (sequência)</a>
+  <a href="#estados">12. Estados e dados</a>
+  <a href="#seguranca">13. Segurança</a>
+  <a href="#implantacao">14. Build e distribuição</a>
+  <div class="grp">Gestão</div>
+  <a href="#riscos">15. Riscos e pendências</a>
+  <a href="#rastreio">16. Rastreabilidade</a>
+  <a href="#catalogo">17. Catálogo de diagramas</a>
+  <a href="#glossario">18. Glossário</a>
+</nav>
+
+<main>
+<header class="hero">
+  <button class="btn menu-btn" id="menuBtn" style="margin-bottom:14px;color:#0e1b2e">☰ Sumário</button>
+  <h1>mcp-winthor (wt.ai)<br>Documento de Visão, Requisitos e Diagramas</h1>
+  <p>Servidor MCP local que liga o ERP TOTVS WinThor a assistentes de IA como Cursor, Claude e ChatGPT, empacotado num app de desktop.</p>
+  <div class="meta">
+    <span class="chip">Documento v1.0</span>
+    <span class="chip">Levantamento em 10/10/2026</span>
+    <span class="chip">Versão do código: 0.1.1</span>
+    <span class="chip">Licença MIT</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section id="resumo">
+  <h2><span class="n">1</span> Sumário executivo</h2>
+  <p class="lead">O wt.ai roda na máquina do usuário e expõe o WinThor como um servidor MCP. O assistente de IA pergunta em linguagem natural; o servidor responde com dados do ERP. As credenciais ficam só nesse computador. Vendas e estoque pesados vêm de uma base local; o resto vai direto à API do WinThor.</p>
+
+  <div class="grid g4" style="margin-bottom:16px">
+    <div class="kpi"><b>33</b><span>tools MCP <code>wt_*</code> expostas ao assistente</span></div>
+    <div class="kpi"><b>2</b><span>bases locais (vendas e estoque), cada uma com SQLite + DuckDB</span></div>
+    <div class="kpi"><b>127.0.0.1</b><span>endereço padrão de escuta: nada exposto à rede por padrão</span></div>
+    <div class="kpi"><b>3</b><span>sistemas operacionais-alvo: Windows, Linux e macOS</span></div>
+  </div>
+
+  <div class="grid g3">
+    <div class="card comp fe">
+      <h3>Servidor MCP · <code>server/</code></h3>
+      <p>NestJS 11 e TypeScript. Fala o protocolo MCP em <code>/mcp</code>, autentica no WinThor (WTA), chama as APIs e entrega resultados paginados que cabem no contexto do modelo.</p>
+    </div>
+    <div class="card comp be">
+      <h3>Ingestão e base local</h3>
+      <p>Copia vendas e estoque do WinThor em segundo plano para SQLite (metadados e cobertura) e DuckDB (fatos), com conferência de totais contra o ERP.</p>
+    </div>
+    <div class="card comp ia">
+      <h3>App desktop · <code>desktop/</code></h3>
+      <p>Electron 35. Sobe o servidor como processo filho, mostra a bandeja e a janela de configuração, e gera instaladores para Windows, Linux e macOS.</p>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <b>Como ler este documento</b>
+    Seções 2 e 3 explicam o porquê e para quem. As seções 4 a 7 trazem a arquitetura com diagramas. As 8 a 10 são os requisitos, com IDs rastreáveis (<code>MCP-</code>, <code>ING-</code>, <code>DSK-</code>, <code>UI-</code>, <code>RNF-</code>, <code>RN-</code>). As 11 a 14 explicam comportamento, estados, segurança e distribuição. A 17 justifica cada diagrama.
+  </div>
+  <div class="callout wr">
+    <b>Base de evidência e procedência</b>
+    Tudo vem do código, do README, de <code>docs/arquitetura.md</code>, de <code>docs/casos-de-uso.md</code>, dos Dockerfiles e dos scripts do repositório. O status dos requisitos reflete o código em 10/10/2026. Atenção: a marca, o e-mail e o WhatsApp de contato no README são de um autor externo à AUTVS (wt.ai / nwerp). A relação formal desse projeto com o ecossistema AUTVS não está documentada no repositório; veja o risco R-09.
+  </div>
+</section>
+
+<section id="visao">
+  <h2><span class="n">2</span> Visão do produto</h2>
+  <p class="lead">Dar a quem opera o WinThor um jeito de conversar com o ERP através de uma IA, sem exportar planilhas e sem entregar as credenciais a um serviço na nuvem.</p>
+
+  <h3>2.1 Declaração de visão</h3>
+  <div class="card">
+    <p style="margin:0;font-size:16px"><b>Para</b> quem opera o WinThor e já usa um assistente de IA, <b>que precisa</b> de respostas sobre vendas, estoque, carteira e clientes sem montar relatórios, <b>o wt.ai</b> é um servidor MCP local <b>que</b> expõe o WinThor como ferramentas tipadas para o assistente, mantendo as credenciais na máquina do usuário. <b>Diferente de</b> integrações hospedadas na nuvem, ele roda localmente e guarda uma cópia agregável dos dados para consultas pesadas.</p>
+  </div>
+
+  <h3>2.2 Problema e proposta de valor</h3>
+  <div class="grid g2">
+    <div class="card">
+      <h4>Problemas</h4>
+      <ul>
+        <li>O WinThor não recorta data livre nas rotinas mobile; só períodos fechados (hoje, mês atual, ano atual...).</li>
+        <li>Varrer pedido a pedido é lento (≈2,9 s por página de 200 pedidos) e estoura o contexto do modelo.</li>
+        <li>Enviar credenciais do ERP para um serviço externo é inaceitável para muitos usuários.</li>
+        <li>Exportar planilha toda vez que surge uma pergunta é trabalho manual.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Valor entregue</h4>
+      <ul>
+        <li><b>Privacidade:</b> credenciais e dados ficam no computador do usuário.</li>
+        <li><b>Velocidade:</b> vendas e estoque agregados leem DuckDB local em vez de varrer o ERP.</li>
+        <li><b>Recorte livre:</b> a base local permite intervalo de datas arbitrário.</li>
+        <li><b>Confiança:</b> a cópia local é conferida contra os totais do WinThor, com tolerância declarada.</li>
+        <li><b>Simplicidade:</b> instalador, tela de configuração e gravação automática no Cursor, Claude e ChatGPT.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>2.3 Objetivos</h3>
+  <div class="tw"><table>
+    <thead><tr><th>#</th><th>Objetivo</th><th>Indicador (proposto)</th></tr></thead>
+    <tbody>
+      <tr><td class="id">OB-1</td><td>Responder perguntas de vendas, estoque, carteira, lucratividade e cadastro por IA</td><td>Cada pergunta dos casos de uso atendida por uma ou mais tools</td></tr>
+      <tr><td class="id">OB-2</td><td>Manter credenciais e dados na máquina do usuário</td><td>Servidor escuta só em loopback; nenhum envio a terceiros além do próprio WinThor e do cliente MCP local</td></tr>
+      <tr><td class="id">OB-3</td><td>Cabimento no contexto do modelo</td><td>Resposta de tool ≤ 80.000 caracteres, sempre paginada</td></tr>
+      <tr><td class="id">OB-4</td><td>Números da base local confiáveis</td><td>Divergência vs. total do WinThor ≤ 0,5% por lote (âncora de conferência)</td></tr>
+      <tr><td class="id">OB-5</td><td>Instalação simples em Windows, Linux e macOS</td><td>Instalador validado por <code>verify-artifacts.sh</code> sem segredos ou source maps</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">Os indicadores são propostas derivadas de limites e regras do código. O repositório não registra metas de adoção ou uso.</p>
+
+  <h3>2.4 Escopo</h3>
+  <div class="grid g2">
+    <div class="card">
+      <h4>Dentro do escopo</h4>
+      <ul>
+        <li>Servidor MCP HTTP local e suas tools de leitura.</li>
+        <li>Autenticação no WinThor WTA e consultas à API e às rotinas mobile (W120 e W106).</li>
+        <li>Base local de vendas e estoque com ingestão automática e sob demanda.</li>
+        <li>Interface web de configuração e gravação da configuração MCP nos clientes de IA.</li>
+        <li>App Electron e instaladores.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Fora do escopo</h4>
+      <ul>
+        <li>Escrever no WinThor: as tools são de consulta.</li>
+        <li>Hospedagem em nuvem multiusuário (o desenho é uma instância por usuário).</li>
+        <li>Autenticação de múltiplos usuários ou perfis dentro do servidor.</li>
+        <li>Relatórios e painéis próprios: quem apresenta é o assistente de IA.</li>
+        <li>Fiscal, financeiro a pagar e demais áreas sem tool (ver seção 8).</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="atores">
+  <h2><span class="n">3</span> Atores e casos de uso</h2>
+  <p class="lead">Quem interage com o sistema e o que cada um consegue fazer.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Ator</th><th>Quem é</th><th>Interage por</th></tr></thead>
+    <tbody>
+      <tr><td><b>Usuário do WinThor</b></td><td>Diretoria, compras, financeiro, comercial ou atendimento</td><td>Conversa com o assistente de IA e abre a tela de configuração</td></tr>
+      <tr><td><b>Assistente de IA</b></td><td>Cursor, Claude (Desktop e Code), ChatGPT</td><td>Cliente MCP: JSON-RPC em <code>http://127.0.0.1:8787/mcp</code></td></tr>
+      <tr><td><b>WinThor WTA</b></td><td>ERP do cliente (sistema externo)</td><td>Autenticação, API de cadastros/estoque e rotinas mobile</td></tr>
+      <tr><td><b>Instalador/mantenedor</b></td><td>Quem gera os instaladores e contribui com código</td><td>Docker Compose, scripts de build e testes</td></tr>
+    </tbody>
+  </table></div>
+
+  <figure class="dg" data-src="d-casos" data-title="Casos de uso">
+    <figcaption><div><b>D3 · Casos de uso</b><small>Perguntas reais do negócio e as tools que as atendem</small></div><button class="btn zoom">Ampliar</button></figcaption>
+    <div class="stage"></div>
+    <div class="why"><b>Por que este diagrama:</b> liga cada pergunta de negócio (diretoria, compras, financeiro, comercial, atendimento, operação) às tools que a respondem, que é a promessa central do produto.</div>
+  </figure>
+</section>
+
+<section id="arquitetura">
+  <h2><span class="n">4</span> Arquitetura geral</h2>
+  <p class="lead">O sistema inteiro roda numa só máquina. A única comunicação externa é com o WinThor.</p>
+
+  <figure class="dg" data-src="d-contexto" data-title="Contexto do sistema">
+    <figcaption><div><b>D1 · Contexto do sistema (C4, nível 1)</b><small>O wt.ai entre o assistente de IA e o WinThor</small></div><button class="btn zoom">Ampliar</button></figcaption>
+    <div class="stage"></div>
+    <div class="why"><b>Por que este diagrama:</b> deixa visível a fronteira de confiança: assistente e servidor ficam na mesma máquina; só o WinThor está do outro lado da rede.</div>
+  </figure>
+
+  <figure class="dg" data-src="d-containers" data-title="Contêineres">
+    <figcaption><div><b>D2 · Contêineres (C4, nível 2)</b><small>Electron, servidor NestJS, interface web e dados locais</small></div><button class="btn zoom">Ampliar</button></figcaption>
+    <div class="stage"></div>
+    <div class="why"><b>Por que este diagrama:</b> mostra quem sobe quem (Electron cria o processo do servidor) e onde ficam os dados.</div>
+  </figure>
+
+  <h3>4.1 Decisões arquiteturais</h3>
+  <div class="tw"><table>
+    <thead><tr><th>ID</th><th>Decisão</th><th>Motivo (do código e da documentação)</th></tr></thead>
+    <tbody>
+      <tr><td class="id">AD-1</td><td>Servidor local por usuário, não serviço na nuvem</td><td>As credenciais não saem do computador; o servidor roda embutido num Electron de vida longa</td></tr>
+      <tr><td class="id">AD-2</td><td>Base local DuckDB (fatos) + SQLite (metadados)</td><td>O WinThor não recorta data livre; agregar localmente é rápido e permite conferência</td></tr>
+      <tr><td class="id">AD-3</td><td>Ingestão no módulo WinThor, leitura nos módulos de vendas e estoque</td><td>Evita ciclo de dependência no grafo do Nest</td></tr>
+      <tr><td class="id">AD-4</td><td>Paginação obrigatória com orçamento de caracteres</td><td>A resposta precisa caber no contexto do modelo</td></tr>
+      <tr><td class="id">AD-5</td><td>Ingestão pausa enquanto há tool em andamento</td><td>Pergunta do usuário não espera atrás de um backfill de cerca de duas horas</td></tr>
+      <tr><td class="id">AD-6</td><td>Constantes de limite no módulo, não serviço injetável</td><td>Mudar a assinatura de <code>WinthorMobileService</code> quebraria os specs; override por variável de ambiente cobre a tunagem</td></tr>
+      <tr><td class="id">AD-7</td><td>Servidor do pacote usa <code>ELECTRON_RUN_AS_NODE</code> e <code>extraResources</code></td><td>JavaScript do servidor fica fora do asar; dados vão para o <code>userData</code></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="servidor">
+  <h2><span class="n">5</span> Servidor MCP · <code>server/</code></h2>
+  <p class="lead">NestJS 11 sobre Express, TypeScript, Zod, SDK MCP 2.0 (beta), DuckDB (<code>@duckdb/node-api</code>) e Handlebars para as páginas de configuração. Escuta em <code>127.0.0.1:8787</code> por padrão.</p>
+
+  <div class="grid g3">
+    <div class="card"><h4>Responsabilidades</h4><ul>
+      <li>Expor as tools MCP em <code>/mcp</code>.</li>
+      <li>Autenticar no WinThor e manter o token.</li>
+      <li>Consultar a API ao vivo ou a base local.</li>
+      <li>Paginar e limitar toda resposta.</li>
+      <li>Servir a tela de configuração e gravar a config.</li>
+    </ul></div>
+    <div class="card"><h4>Limites principais</h4><ul>
+      <li>Página: padrão 10, teto 200 itens.</li>
+      <li>Texto por tool: 80.000 caracteres.</li>
+      <li>HTTP ao WinThor: 20 s e 8 MB por resposta.</li>
+      <li>Varredura de agregação: 3.000 pedidos.</li>
+      <li>Cache de listas: 2 min.</li>
+    </ul></div>
+    <div class="card"><h4>Grupos de tools</h4><ul>
+      <li><b>Servidor:</b> <code>wt_ping</code>, <code>wt_test_connection</code>, <code>wt_server_info</code></li>
+      <li><b>Cadastro:</b> filiais, clientes, pedidos de venda</li>
+      <li><b>Vendas e estoque:</b> base local e sincronização</li>
+      <li><b>Mobile:</b> inadimplência (W120) e lucratividade (W106)</li>
+      <li><b>Faturamento:</b> <code>wt_faturamento_agregado</code></li>
+    </ul></div>
+  </div>
+
+  <figure class="dg" data-src="d-servidor" data-title="Módulos do servidor">
+    <figcaption><div><b>D4 · Componentes do servidor</b><small>Módulos NestJS e suas dependências</small></div><button class="btn zoom">Ampliar</button></figcaption>
+    <div class="stage"></div>
+    <div class="why"><b>Por que este diagrama:</b> mostra o grafo de módulos e a regra que evita ciclo: a ingestão mora em WinThor; a leitura, em Vendas e Estoque.</div>
+  </figure>
+
+  <figure class="dg" data-src="d-roteamento" data-title="Roteamento de fonte de dados">
+    <figcaption><div><b>D13 · De onde vem cada resposta</b><small>Base local, rotina mobile ao vivo ou rebaixamento de agrupamento</small></div><button class="btn zoom">Ampliar</button></figcaption>
+    <div class="stage"></div>
+    <div class="why"><b>Por que este diagrama:</b> a escolha entre base local e WinThor ao vivo, e o rebaixamento quando o recorte é grande, são decisões com condições. Um fluxo de decisão explica melhor.</div>
+  </figure>
+</section>
+
+<section id="dados-locais">
+  <h2><span class="n">6</span> Ingestão e base local</h2>
+  <p class="lead">Vendas e estoque seguem o mesmo desenho: metadados e cobertura em SQLite, fatos em DuckDB.</p>
+
+  <div class="grid g2" style="margin-bottom:14px">
+    <div class="card"><h4>Vendas</h4><p>Percorre o ano atual e o anterior (retenção de 2 anos) por filial e período, página a página (100 itens, mínimo 25), e a cada ciclo revarre o mês atual e o anterior. Cada lote registra cobertura por dia, filial e posição, e uma âncora de conferência contra o total do WinThor.</p></div>
+    <div class="card"><h4>Estoque</h4><p>Refaz a fotografia por filial quando a cópia passa da validade. A tool <code>wt_estoque_por_filial</code> usa a base local quando a filial já foi sincronizada e, senão, a API ao vivo.</p></div>
+  </div>
+
+  <figure class="dg" data-src="d-ingestao" data-title="Ingestão e leitura local">
+    <figcaption><div><b>D9 · Ingestão e leitura da base local</b><small>Do WinThor aos arquivos locais e às tools de leitura</small></div><button class="btn zoom">Ampliar</button></figcaption>
+    <div class="stage"></div>
+    <div class="why"><b>Por que este diagrama:</b> é um fluxo de dados em pipeline: três origens, dois serviços de ingestão, quatro arquivos e duas famílias de tools.</div>
+  </figure>
+
+  <figure class="dg" data-src="d-dados" data-title="Modelo de dados local">
+    <figcaption><div><b>D10 · Modelo de dados da base de vendas</b><small>SQLite (metadados) e DuckDB (fato <code>pedido</code>)</small></div><button class="btn zoom">Ampliar</button></figcaption>
+    <div class="stage"></div>
+    <div class="why"><b>Por que este diagrama:</b> mostra como instância, lote, cobertura e âncora sustentam a conferência, e como o fato <code>pedido</code> aponta para as dimensões. Atributos reduzidos aos principais.</div>
+  </figure>
+</section>
+
+<section id="desktop">
+  <h2><span class="n">7</span> App desktop · <code>desktop/</code></h2>
+  <p class="lead">Electron 35 e TypeScript, empacotado com electron-builder (<code>ai.wt.desktop</code>). Um único processo principal controla o filho do servidor.</p>
+
+  <div class="grid g3">
+    <div class="card"><h4>Responsabilidades</h4><ul>
+      <li>Trava de instância única.</li>
+      <li>Bandeja do sistema e tela de abertura (splash).</li>
+      <li>Subir e encerrar o servidor filho.</li>
+      <li>Abrir a janela em <code>http://127.0.0.1:8787</code>.</li>
+      <li>Iniciar junto com o sistema (opcional).</li>
+    </ul></div>
+    <div class="card"><h4>Empacotamento</h4><ul>
+      <li>Servidor em <code>extraResources</code> (fora do asar).</li>
+      <li>Dados em <code>userData</code> (<code>WTA_DATA_DIR</code>).</li>
+      <li>Sem source maps nem <code>.d.ts</code> no pacote.</li>
+    </ul></div>
+    <div class="card"><h4>Alvos</h4><ul>
+      <li>Windows: NSIS (<code>.exe</code>)</li>
+      <li>Linux: AppImage</li>
+      <li>macOS: build nativo (<code>dist:mac</code>)</li>
+    </ul></div>
+  </div>
+
+  <figure class="dg" data-src="d-desktop" data-title="Componentes do desktop">
+    <figcaption><div><b>D5 · Componentes do app desktop</b><small>Processo principal, processo filho e interface</small></div><button class="btn zoom">Ampliar</button></figcaption>
+    <div class="stage"></div>
+    <div class="why"><b>Por que este diagrama:</b> deixa claro o modelo de dois processos e quais arquivos do desktop cuidam de cada responsabilidade.</div>
+  </figure>
+</section>
+
+<section id="rf">
+  <h2><span class="n">8</span> Requisitos funcionais</h2>
+  <p class="lead">Prioridade pelo método MoSCoW. <span class="tag s-ok">Implementado</span> existe no código; <span class="tag s-part">Parcial</span> existe com lacuna; <span class="tag s-pend">Pendente</span> não encontrado no código.</p>
+
+  <div class="filters">
+    <input type="search" id="rfq" placeholder="Buscar por texto ou ID..." aria-label="Buscar requisito">
+    <select id="rfc" aria-label="Componente"><option value="">Todos os componentes</option><option>MCP</option><option>ING</option><option>DSK</option><option>UI</option></select>
+    <select id="rfp" aria-label="Prioridade"><option value="">Todas as prioridades</option><option>Must</option><option>Should</option><option>Could</option></select>
+    <select id="rfs" aria-label="Status"><option value="">Todos os status</option><option>Implementado</option><option>Parcial</option><option>Pendente</option></select>
+    <span class="count" id="rfn"></span>
+  </div>
+  <div class="tw"><table id="rft">
+    <thead><tr><th>ID</th><th>Comp.</th><th>Requisito</th><th>Prio.</th><th>Status</th><th>Critério de aceite</th></tr></thead>
+    <tbody></tbody>
+  </table></div>
+</section>
+
+<section id="rnf">
+  <h2><span class="n">9</span> Requisitos não funcionais</h2>
+  <p class="lead">Qualidades exigidas, com o mecanismo ou a medida que as sustenta.</p>
+  <div class="tw"><table>
+    <thead><tr><th>ID</th><th>Categoria</th><th>Requisito</th><th>Mecanismo / medida</th></tr></thead>
+    <tbody>
+      <tr><td class="id">RNF-01</td><td>Privacidade</td><td>Credenciais e dados ficam na máquina do usuário</td><td>Servidor local; senha gravada como MD5 maiúsculo (padrão WTA), nunca em texto; <code>server/data/config.json</code> e <code>.env</code> fora do contexto do Docker</td></tr>
+      <tr><td class="id">RNF-02</td><td>Segurança</td><td>Escuta apenas em loopback por padrão</td><td><code>HOST=127.0.0.1</code> (<code>.env.example</code> e <code>main.ts</code>)</td></tr>
+      <tr><td class="id">RNF-03</td><td>Segurança</td><td>Pacote sem informação sensível</td><td><code>verify-artifacts.sh</code> falha o build com source maps, <code>.d.ts</code>, fontes <code>.ts</code>, <code>.env</code>, <code>config.json</code> ou endereço de rede privada</td></tr>
+      <tr><td class="id">RNF-04</td><td>Desempenho</td><td>Resposta de tool dentro de tolerância</td><td>Página de 200 pedidos ≈ 2,9 s; teto de 3.000 pedidos ≈ 45 s; agregação recusa acima do teto</td></tr>
+      <tr><td class="id">RNF-05</td><td>Desempenho</td><td>Resposta cabe no contexto do modelo</td><td>Orçamento de 80.000 caracteres; paginação com continuação; truncamento registra erro</td></tr>
+      <tr><td class="id">RNF-06</td><td>Resiliência</td><td>Tolerar falha de rede e payload grande</td><td>Timeout 20 s; 3 retentativas; pageSize adaptativo (100 → 25); guarda contra linhas repetidas; 401 reautentica</td></tr>
+      <tr><td class="id">RNF-07</td><td>Resiliência</td><td>Ingestão cooperativa com o usuário</td><td>Pausa de 250 ms entre páginas e 3 s quando há tool em voo</td></tr>
+      <tr><td class="id">RNF-08</td><td>Integridade</td><td>Conferência numérica da cópia local</td><td>Tolerância de 0,5% (<code>WTA_TOLERANCIA_CONFERENCIA_PCT</code>); âncora por filial, período e posição</td></tr>
+      <tr><td class="id">RNF-09</td><td>Memória</td><td>Uso limitado em processo de vida longa</td><td>Resposta upstream ≤ 8 MB; cache de listas ≤ 16 milhões de caracteres e 8 entradas</td></tr>
+      <tr><td class="id">RNF-10</td><td>Configurabilidade</td><td>Ajuste sem recompilar</td><td>Limites lidos de variáveis <code>WTA_*</code></td></tr>
+      <tr><td class="id">RNF-11</td><td>Portabilidade</td><td>Windows, Linux e macOS</td><td>NSIS, AppImage e build nativo no mac; imagem de build amd64 com Wine</td></tr>
+      <tr><td class="id">RNF-12</td><td>Manutenibilidade</td><td>Testes automatizados</td><td>18 arquivos <code>*.spec.ts</code> mais e2e (<code>npm test</code> e <code>npm run test:e2e</code>); ESLint e Prettier</td></tr>
+      <tr><td class="id">RNF-13</td><td>Usabilidade</td><td>Configuração em uma tela</td><td>URL, login e senha; teste de conexão antes de gravar</td></tr>
+      <tr><td class="id">RNF-14</td><td>Licenciamento</td><td>Código aberto</td><td>MIT (<code>LICENSE</code>)</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="rn">
+  <h2><span class="n">10</span> Regras de negócio</h2>
+  <p class="lead">Regras do domínio WinThor que o código precisa respeitar, extraídas de comentários e constantes.</p>
+  <div class="tw"><table>
+    <thead><tr><th>ID</th><th>Regra</th><th>Observação</th></tr></thead>
+    <tbody>
+      <tr><td class="id">RN-01</td><td>A senha do WinThor vai como MD5 em maiúsculas (padrão WTA); o texto puro não é gravado.</td><td>Login em <code>/winthor/autenticacao/v1/login</code>, validado em <code>/logado</code>.</td></tr>
+      <tr><td class="id">RN-02</td><td>Períodos das rotinas mobile: 1 Hoje, 2 Ontem, 3 Mês atual (padrão), 4 Mês anterior, 7 Ano atual, 8 Ano anterior.</td><td>Intervalo livre só existe pela base local.</td></tr>
+      <tr><td class="id">RN-03</td><td>Posições de pedido (W106): 0 Todos, 1 Bloqueado, 2 Pendente, 3 Liberado, 4 Faturado.</td><td><code>wt_buscar_pedidos_venda</code> usa status padrão <code>ATIVO</code>.</td></tr>
+      <tr><td class="id">RN-04</td><td>Três nomes de endpoint mobile têm erros de grafia que fazem parte do contrato e são reproduzidos literalmente.</td><td>Corrigi-los quebra a chamada.</td></tr>
+      <tr><td class="id">RN-05</td><td>A carteira de inadimplência é posição atual e não depende de período.</td><td>Rotina mobile ao vivo.</td></tr>
+      <tr><td class="id">RN-06</td><td>Agrupamentos por <code>filial</code> e <code>supervisor</code> são exatos e não varrem pedidos; <code>rca</code> usa o agregado nativo; <code>cliente</code> só cabe em recortes pequenos.</td><td>Se não couber, a resposta cai para <code>filial</code> e avisa em <code>rebaixado</code>.</td></tr>
+      <tr><td class="id">RN-07</td><td>Intervalo de datas livre (<code>dataInicio</code>/<code>dataFim</code>) usa a base local; sem ela, vale período fechado.</td><td>O assistente confere a cobertura antes de consultar.</td></tr>
+      <tr><td class="id">RN-08</td><td>Se a cobertura local está vazia ou atrasada, o assistente dispara a sincronização antes de responder.</td><td><code>wt_vendas_sincronizar</code> e <code>wt_estoque_sincronizar</code>.</td></tr>
+      <tr><td class="id">RN-09</td><td>A soma local confere com o total do WinThor se a divergência for ≤ 0,5%.</td><td>Cobre arredondamento do ERP, não erro de agregação.</td></tr>
+      <tr><td class="id">RN-10</td><td>A ingestão de vendas usa posição <code>0</code> (todos) e margem mínima de lucro <code>100</code>.</td><td>Constantes <code>POSICAO_INGESTAO</code> e <code>MARGEM_PADRAO</code>.</td></tr>
+      <tr><td class="id">RN-11</td><td>Em período anual o W106 devolve o pedido completo; páginas de 200 linhas estouram o limite de payload.</td><td>Por isso a ingestão nasce em 100 por página.</td></tr>
+      <tr><td class="id">RN-12</td><td><code>wt_estoque_por_filial</code> exige <code>codigoFilial</code>.</td><td>Filtro opcional por código ou descrição do produto.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="fluxos">
+  <h2><span class="n">11</span> Fluxos principais (diagramas de sequência)</h2>
+  <p class="lead">Quatro caminhos definem o comportamento: subir o app, configurar o WinThor, fazer uma pergunta e ingerir dados.</p>
+
+  <figure class="dg" data-src="d-seq-subida" data-title="Subida do aplicativo">
+    <figcaption><div><b>D6 · Subida do aplicativo</b><small>Electron cria o processo do servidor e abre a janela</small></div><button class="btn zoom">Ampliar</button></figcaption>
+    <div class="stage"></div>
+    <div class="why"><b>Por que este diagrama:</b> a ordem importa: instância única, bandeja, spawn, espera da porta, só então a janela.</div>
+  </figure>
+
+  <figure class="dg" data-src="d-seq-config" data-title="Configuração e login">
+    <figcaption><div><b>D7 · Configuração e login no WinThor</b><small>Teste de conexão antes de gravar</small></div><button class="btn zoom">Ampliar</button></figcaption>
+    <div class="stage"></div>
+    <div class="why"><b>Por que este diagrama:</b> mostra o que é gravado (URL, login, MD5) e que a gravação só ocorre depois de o WinThor aceitar a conexão.</div>
+  </figure>
+
+  <figure class="dg" data-src="d-seq-pergunta" data-title="Pergunta do assistente">
+    <figcaption><div><b>D8 · Caminho de uma pergunta</b><small>Tool MCP, base local ou WinThor ao vivo</small></div><button class="btn zoom">Ampliar</button></figcaption>
+    <div class="stage"></div>
+    <div class="why"><b>Por que este diagrama:</b> é o fluxo central do produto, com a bifurcação entre base local e ao vivo e a pausa da ingestão.</div>
+  </figure>
+</section>
+
+<section id="estados">
+  <h2><span class="n">12</span> Estados e dados</h2>
+  <p class="lead">O servidor tem dois ciclos de estado independentes: o de configuração e o de ingestão.</p>
+
+  <figure class="dg" data-src="d-estado" data-title="Estados do servidor">
+    <figcaption><div><b>D11 · Estados: configuração e ingestão</b><small>Máquina de estados do servidor</small></div><button class="btn zoom">Ampliar</button></figcaption>
+    <div class="stage"></div>
+    <div class="why"><b>Por que este diagrama:</b> o estado "não configurado" bloqueia o <code>/mcp</code> com 503, e o estado de ingestão decide se uma pergunta espera ou segue. Transições são o ponto central.</div>
+  </figure>
+
+  <div class="tw"><table>
+    <thead><tr><th>Arquivo (em <code>WTA_DATA_DIR</code>)</th><th>Conteúdo</th></tr></thead>
+    <tbody>
+      <tr><td><code>config.json</code></td><td>URL do WinThor, login e senha em MD5</td></tr>
+      <tr><td><code>vendas-meta.db</code> (SQLite)</td><td>Instância, lotes, cobertura, âncoras e dimensões (filial, cliente, RCA, emitente, posição)</td></tr>
+      <tr><td><code>vendas-fato.duckdb</code></td><td>Tabela <code>pedido</code> com valores, custo e lucro</td></tr>
+      <tr><td><code>estoque-meta.db</code> e <code>estoque-fato.duckdb</code></td><td>Mesmo desenho para a fotografia de estoque por filial</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="seguranca">
+  <h2><span class="n">13</span> Segurança</h2>
+  <p class="lead">O modelo de segurança é o isolamento do computador do usuário. Ele funciona bem enquanto nada além do usuário alcança a porta 8787.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Camada</th><th>Controle encontrado</th><th>Lacuna observada</th></tr></thead>
+    <tbody>
+      <tr><td>Rede</td><td>Escuta em <code>127.0.0.1</code> por padrão</td><td>Variável <code>HOST</code> permite expor; sem aviso</td></tr>
+      <tr><td>Acesso ao <code>/mcp</code></td><td>Responde 503 até haver configuração</td><td>Não encontrei token, validação de <code>Origin</code> ou autenticação própria no controlador</td></tr>
+      <tr><td>Acesso a <code>/setup</code></td><td>Teste de conexão antes de gravar</td><td>Rotas <code>POST /setup</code>, <code>/setup/reset</code> e <code>/setup/mcp/*</code> sem autenticação visível</td></tr>
+      <tr><td>Credencial</td><td>Senha vira MD5; texto puro não é gravado</td><td>O MD5 é aceito pelo WTA como senha; o arquivo <code>config.json</code> equivale a uma senha. Não encontrei restrição de permissão do arquivo</td></tr>
+      <tr><td>Dados em disco</td><td>Base local no <code>userData</code> do Electron</td><td>Sem cifra em repouso (não encontrei)</td></tr>
+      <tr><td>Distribuição</td><td>Verificação de artefatos; sem source maps</td><td>Nenhuma lacuna encontrada</td></tr>
+      <tr><td>Operações</td><td>Tools somente de consulta</td><td>As tools de sincronização gravam só na base local</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout wr"><b>Leitura do risco</b>As lacunas acima vêm de leitura de código, não de teste. Se outro processo local ou uma página web conseguir chamar <code>http://127.0.0.1:8787/mcp</code>, poderá usar as tools com as credenciais do usuário. A mitigação sugerida está em R-01 e R-02.</div>
+</section>
+
+<section id="implantacao">
+  <h2><span class="n">14</span> Build e distribuição</h2>
+  <p class="lead">Os instaladores são construídos dentro de uma imagem Docker, com validação automática antes da exportação.</p>
+
+  <figure class="dg" data-src="d-build" data-title="Build do instalador">
+    <figcaption><div><b>D12 · Build dos instaladores (Docker multi-stage)</b><small>Do código ao instalador validado</small></div><button class="btn zoom">Ampliar</button></figcaption>
+    <div class="stage"></div>
+    <div class="why"><b>Por que este diagrama:</b> a segurança do pacote vem da ordem dos estágios: compilar, limpar, empacotar, validar e só então exportar.</div>
+  </figure>
+
+  <div class="tw"><table>
+    <thead><tr><th>Item</th><th>Detalhe</th></tr></thead>
+    <tbody>
+      <tr><td>Comando</td><td><code>docker compose build installer</code> e <code>docker compose run --rm installer</code></td></tr>
+      <tr><td>Imagem base</td><td><code>electronuserland/builder:wine</code> (amd64; em Apple Silicon exige Rosetta)</td></tr>
+      <tr><td>Alvos padrão</td><td><code>--win --linux</code> (variável <code>TARGETS</code>)</td></tr>
+      <tr><td>Saída</td><td><code>desktop/release/</code>: <code>.exe</code>, <code>.AppImage</code>, <code>.blockmap</code>, <code>latest*.yml</code></td></tr>
+      <tr><td>Variáveis do servidor</td><td><code>HOST</code>, <code>PORT</code>, <code>WTA_BASE</code> e as <code>WTA_*</code> de limites</td></tr>
+      <tr><td>Desenvolvimento</td><td><code>npm run start:dev</code> em <code>server/</code> (porta 8787); <code>npm run dev</code> em <code>desktop/</code></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="riscos">
+  <h2><span class="n">15</span> Riscos e pendências</h2>
+  <p class="lead">Itens identificados na leitura do código. Severidade é avaliação deste levantamento.</p>
+  <div class="tw"><table>
+    <thead><tr><th>ID</th><th>Risco / pendência</th><th>Impacto</th><th>Sev.</th><th>Tratamento sugerido</th></tr></thead>
+    <tbody>
+      <tr><td class="id">R-01</td><td><code>/mcp</code> sem autenticação ou validação de <code>Origin</code> visível</td><td>Processo local ou página com DNS rebinding poderia consultar o ERP</td><td><span class="tag t-must">Alta</span></td><td>Token por instalação, validar <code>Host</code> e <code>Origin</code>, recusar origens de navegador</td></tr>
+      <tr><td class="id">R-02</td><td>Rotas de <code>/setup</code> (gravar, resetar, escrever config dos clientes de IA) sem autenticação visível</td><td>Troca de credencial ou de configuração por outro processo local</td><td><span class="tag t-must">Alta</span></td><td>Mesmo token e proteção contra CSRF</td></tr>
+      <tr><td class="id">R-03</td><td><code>config.json</code> guarda MD5 que vale como senha no WTA, sem proteção de permissão ou cofre do sistema</td><td>Quem lê o arquivo autentica no ERP</td><td><span class="tag t-must">Alta</span></td><td>Cofre do SO (Keychain, DPAPI, libsecret) ou permissão 600</td></tr>
+      <tr><td class="id">R-04</td><td>Backfill inicial leva cerca de duas horas e consome o ERP</td><td>Carga no WinThor; usuário sem dados completos no começo</td><td><span class="tag t-should">Média</span></td><td>Janela de baixa carga; indicar progresso na tela</td></tr>
+      <tr><td class="id">R-05</td><td>Contrato com endpoints mobile de grafia errada reproduzida literalmente</td><td>Qualquer correção do lado WinThor quebra as tools</td><td><span class="tag t-should">Média</span></td><td>Teste de contrato contra o ambiente real</td></tr>
+      <tr><td class="id">R-06</td><td>SDK MCP em versão beta (<code>2.0.0-beta.5</code>)</td><td>Mudança de API entre betas</td><td><span class="tag t-should">Média</span></td><td>Travar versão; acompanhar a versão estável</td></tr>
+      <tr><td class="id">R-07</td><td>Agregação por cliente limitada a 3.000 pedidos (mês de 20 filiais tem cerca de 13.500)</td><td>Resposta rebaixada para <code>filial</code></td><td><span class="tag t-should">Média</span></td><td>Agregar por cliente na base local (DuckDB)</td></tr>
+      <tr><td class="id">R-08</td><td>DuckDB é módulo nativo e o build usa Wine para Windows</td><td>Falha de empacotamento por plataforma</td><td><span class="tag t-could">Baixa</span></td><td>Teste de instalação em cada SO</td></tr>
+      <tr><td class="id">R-09</td><td>Procedência: marca e contatos do README são de autor externo (wt.ai / nwerp); relação com o ecossistema AUTVS não consta no repositório</td><td>Dúvida de autoria, licença e suporte</td><td><span class="tag t-should">Média</span></td><td>Registrar a origem e o acordo de uso; avaliar rebranding</td></tr>
+      <tr><td class="id">R-10</td><td>Documentação de contrato referenciada (<code>docs/api-winthor-mobile-rotinas-120-106.md</code>) não existe em <code>docs/</code></td><td>Perde-se a fonte do contrato das rotinas mobile</td><td><span class="tag t-could">Baixa</span></td><td>Recuperar ou recriar o documento</td></tr>
+      <tr><td class="id">R-11</td><td>Sem tools para financeiro a pagar, fiscal, compras</td><td>Cobertura limitada do ERP</td><td><span class="tag t-could">Baixa</span></td><td>Definir roadmap de novas tools</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="rastreio">
+  <h2><span class="n">16</span> Rastreabilidade</h2>
+  <p class="lead">Quais requisitos sustentam cada objetivo. A contagem é calculada a partir da tabela da seção 8.</p>
+  <div class="grid g4" id="rkpi" style="margin-bottom:14px"></div>
+  <div class="tw"><table>
+    <thead><tr><th>Objetivo</th><th>Requisitos funcionais</th><th>Não funcionais e regras</th></tr></thead>
+    <tbody>
+      <tr><td><b>OB-1</b> Perguntas por IA</td><td>MCP-01, MCP-03 a MCP-09, ING-09</td><td>RN-02, RN-03, RN-05, RN-06, RN-12</td></tr>
+      <tr><td><b>OB-2</b> Dados na máquina</td><td>MCP-02, MCP-12, UI-01, UI-02</td><td>RNF-01, RNF-02, RN-01</td></tr>
+      <tr><td><b>OB-3</b> Cabe no contexto</td><td>MCP-10, MCP-11, MCP-13, MCP-14</td><td>RNF-05, RNF-09</td></tr>
+      <tr><td><b>OB-4</b> Números confiáveis</td><td>MCP-15, ING-01 a ING-04, ING-07</td><td>RNF-06, RNF-07, RNF-08, RN-09</td></tr>
+      <tr><td><b>OB-5</b> Instalação simples</td><td>DSK-01 a DSK-07, UI-03</td><td>RNF-03, RNF-11, RNF-13</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="catalogo">
+  <h2><span class="n">17</span> Catálogo de diagramas e critério de escolha</h2>
+  <p class="lead">Cada pergunta de projeto tem um tipo de diagrama que a responde melhor.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Diagrama</th><th>Tipo</th><th>Pergunta que responde</th></tr></thead>
+    <tbody>
+      <tr><td>D1 Contexto</td><td>C4 nível 1</td><td>Com quem o sistema conversa?</td></tr>
+      <tr><td>D2 Contêineres</td><td>C4 nível 2</td><td>Quais peças rodam e quem sobe quem?</td></tr>
+      <tr><td>D3 Casos de uso</td><td>Casos de uso</td><td>Que pergunta de negócio cada tool atende?</td></tr>
+      <tr><td>D4 Servidor, D5 Desktop</td><td>Componentes</td><td>Como cada parte é organizada por dentro?</td></tr>
+      <tr><td>D6, D7, D8 Sequência</td><td>Sequência</td><td>Em que ordem as coisas acontecem?</td></tr>
+      <tr><td>D9 Ingestão</td><td>Fluxo de dados</td><td>De onde vêm e para onde vão os dados?</td></tr>
+      <tr><td>D10 Dados locais</td><td>Entidade-relacionamento</td><td>Que informação a base local guarda?</td></tr>
+      <tr><td>D11 Estados</td><td>Máquina de estados</td><td>Quais estados o servidor assume?</td></tr>
+      <tr><td>D12 Build</td><td>Fluxograma</td><td>Como o instalador é produzido e validado?</td></tr>
+      <tr><td>D13 Roteamento</td><td>Fluxo de decisão</td><td>Que fonte responde a cada pergunta?</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">Os diagramas são desenhados em Mermaid no navegador. Sem internet, cada figura mostra o texto-fonte. Use "Ampliar" para tela cheia.</p>
+</section>
+
+<section id="glossario">
+  <h2><span class="n">18</span> Glossário</h2>
+  <div class="tw"><table>
+    <thead><tr><th>Termo</th><th>Significado</th></tr></thead>
+    <tbody>
+      <tr><td><b>MCP</b></td><td>Model Context Protocol: padrão para um assistente de IA chamar ferramentas externas.</td></tr>
+      <tr><td><b>Tool</b></td><td>Função exposta ao assistente (<code>wt_*</code>), com parâmetros tipados.</td></tr>
+      <tr><td><b>WTA</b></td><td>Camada de API do WinThor usada para autenticar e consultar.</td></tr>
+      <tr><td><b>W120 / W106</b></td><td>Rotinas mobile do WinThor Anywhere: inadimplência e lucratividade.</td></tr>
+      <tr><td><b>RCA</b></td><td>Representante comercial autônomo (vendedor).</td></tr>
+      <tr><td><b>DuckDB / SQLite</b></td><td>Bancos embutidos usados para fatos agregáveis e para metadados.</td></tr>
+      <tr><td><b>Cobertura</b></td><td>Registro de quais dias, filiais e posições já foram copiados.</td></tr>
+      <tr><td><b>Âncora</b></td><td>Comparação entre o total local e o total do WinThor para um recorte.</td></tr>
+      <tr><td><b>Backfill</b></td><td>Carga inicial do histórico (ano atual e anterior).</td></tr>
+      <tr><td><b>Rebaixado</b></td><td>Resposta que caiu para agrupamento mais simples porque o recorte pedido era grande demais.</td></tr>
+      <tr><td><b>userData</b></td><td>Pasta de dados do app Electron, onde ficam config e bases.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+</div>
+<footer>
+  mcp-winthor (wt.ai) · documento gerado em 10/10/2026 a partir do código, do README e de <code>docs/</code> do repositório <code>mcp-winthor</code>.
+</footer>
+</main>
+</div>
+
+<div class="tools">
+  <button id="printBtn" title="Imprimir ou salvar em PDF">Imprimir</button>
+  <button id="themeBtn" title="Alternar tema claro/escuro">Tema</button>
+</div>
+
+<dialog id="zm">
+  <div class="bar"><b id="zt"></b><span><button class="btn" id="zin">+</button> <button class="btn" id="zout">−</button> <button class="btn" id="zc">Fechar</button></span></div>
+  <div class="body" id="zb"></div>
+</dialog>
+
+<!-- ======================= FONTES DOS DIAGRAMAS ======================= -->
+
+<script type="text/plain" id="d-contexto">
+flowchart LR
+  U(["Usuário do WinThor"])
+  subgraph M["Máquina do usuário"]
+    direction LR
+    A["Assistente de IA<br/>Cursor, Claude, ChatGPT<br/>cliente MCP"]
+    S[["wt.ai<br/><b>servidor MCP + app desktop</b>"]]
+    D[("Dados locais<br/>config, SQLite, DuckDB")]
+    A -- "MCP / JSON-RPC<br/>127.0.0.1:8787/mcp" --> S
+    S --> D
+  end
+  W["WinThor WTA<br/>autenticação, API de cadastros e estoque,<br/>rotinas mobile W120 e W106"]
+  U -- "pergunta em linguagem natural" --> A
+  U -- "configura URL, login e senha" --> S
+  S -- "consultas ao vivo e ingestão<br/>em segundo plano" --> W
+  classDef sys fill:#285c83,stroke:#0f2742,color:#fff
+  classDef ext fill:#eef2f8,stroke:#9db0c8,color:#0e1b2e
+  class S sys
+  class W,A ext
+</script>
+
+<script type="text/plain" id="d-containers">
+flowchart TB
+  U(["Usuário"])
+  AI["Assistente de IA<br/>cliente MCP"]
+  subgraph PC["Máquina do usuário"]
+    direction TB
+    subgraph EL["App desktop · Electron 35"]
+      direction LR
+      MP["Processo principal<br/>instância única, bandeja, splash"] ~~~ JN["Janela<br/>abre http://127.0.0.1:8787"]
+    end
+    subgraph SV["Servidor · NestJS 11 · processo filho Node"]
+      direction LR
+      MCP["Endpoint /mcp<br/>tools wt_*"] ~~~ WEB["Interface web<br/>/ e /setup · Handlebars"] ~~~ WTA["Cliente WinThor<br/>auth, API, mobile"] ~~~ ING["Ingestão em segundo plano<br/>vendas e estoque"]
+    end
+    DB[("WTA_DATA_DIR<br/>config.json<br/>SQLite + DuckDB")]
+  end
+  W["WinThor WTA"]
+  U --> AI
+  U --> JN
+  AI -- "HTTP JSON-RPC" --> MCP
+  JN -- "HTTP" --> WEB
+  MP -- "spawn ELECTRON_RUN_AS_NODE" --> SV
+  MCP --> WTA
+  MCP -- "lê" --> DB
+  WEB -- "grava config" --> DB
+  ING -- "grava" --> DB
+  ING --> WTA
+  WTA -- "HTTPS" --> W
+  classDef ext fill:#eef2f8,stroke:#9db0c8,color:#0e1b2e
+  class AI,W ext
+</script>
+
+<script type="text/plain" id="d-casos">
+flowchart LR
+  U(["Usuário do WinThor<br/>via assistente de IA"])
+  subgraph G1["Diretoria"]
+    direction TB
+    C1("Vendas do mês vs. mês anterior por filial")
+  end
+  subgraph G2["Compras"]
+    direction TB
+    C2("Produtos sem saldo e cobertura de estoque")
+  end
+  subgraph G3["Financeiro"]
+    direction TB
+    C3("Carteira em atraso por faixa, cliente, supervisor")
+  end
+  subgraph G4["Comercial"]
+    direction TB
+    C4("Lucratividade por RCA e por pedido")
+  end
+  subgraph G5["Atendimento"]
+    direction TB
+    C5("Achar cliente e ver pedidos ativos")
+  end
+  subgraph G6["Operação"]
+    direction TB
+    C6("Faturamento agregado por filial, supervisor, RCA, cliente")
+  end
+  T1[/"wt_vendas_base_local<br/>wt_vendas_sincronizar"/]
+  T2[/"wt_estoque_base_local<br/>wt_estoque_por_filial<br/>wt_estoque_sincronizar"/]
+  T3[/"wt_inadimplencia_*"/]
+  T4[/"wt_lucratividade_*"/]
+  T5[/"wt_buscar_clientes<br/>wt_buscar_pedidos_venda<br/>wt_list_filiais"/]
+  T6[/"wt_faturamento_agregado"/]
+  U --> C1 & C2 & C3 & C4 & C5 & C6
+  C1 --> T1
+  C1 --> T6
+  C2 --> T2
+  C3 --> T3
+  C4 --> T4
+  C5 --> T5
+  C6 --> T6
+</script>
+
+<script type="text/plain" id="d-servidor">
+flowchart TB
+  APP["AppModule"]
+  APP --> CFG["WtConfigModule<br/>config.json e diretório de dados"]
+  APP --> SET["SetupModule<br/>páginas / e /setup,<br/>grava config dos clientes de IA"]
+  APP --> WT["WinthorModule"]
+  APP --> MCP["McpModule<br/>/mcp · McpServerFactory<br/>tools de servidor, cadastro,<br/>vendas, estoque, mobile"]
+  subgraph WS["Dentro de WinthorModule"]
+    direction LR
+    AU["WinthorAuthService<br/>login MD5, token em memória"] ~~~ AP["WinthorApiService<br/>filiais, pedidos, produtos<br/>cache TTL"] ~~~ MB["WinthorMobileService<br/>W120 e W106"] ~~~ IG["Ingestão<br/>vendas e estoque"]
+  end
+  WT --> WS
+  VD["VendasModule<br/>meta, fato, consulta, UI de status"]
+  ES["EstoqueModule<br/>meta, fato, consulta"]
+  WT --> VD
+  WT --> ES
+  MCP --> WT
+  MCP --> PG["Paginação e tool-result<br/>envelope, teto de página,<br/>orçamento de caracteres"]
+  classDef ext fill:#eef2f8,stroke:#9db0c8,color:#0e1b2e
+  class PG ext
+</script>
+
+<script type="text/plain" id="d-roteamento">
+flowchart TD
+  Q(["Tool recebe a pergunta"]) --> T{"Tipo de dado"}
+  T -- "cadastro: clientes, pedidos, filiais" --> LIVE1["API WinThor ao vivo<br/>filiais com cache curto"]
+  T -- "inadimplência ou lucratividade" --> MOB["Rotinas mobile ao vivo<br/>W120 e W106<br/>período fechado"]
+  T -- "vendas ou estoque agregados" --> COB{"Cobertura local<br/>completa e atual?"}
+  COB -- "não" --> SYNC["wt_*_sincronizar<br/>dispara ingestão e mostra progresso"]
+  SYNC --> LOC
+  COB -- "sim" --> LOC["Base local<br/>DuckDB + SQLite"]
+  T -- "faturamento agregado" --> FA{"Tem dataInicio<br/>e dataFim?"}
+  FA -- "sim" --> LOC
+  FA -- "não" --> PF["Período fechado do WinThor"]
+  PF --> AG{"Agrupar por"}
+  AG -- "filial ou supervisor" --> EX["Exato, sem varrer pedidos"]
+  AG -- "rca" --> NA["Agregado nativo"]
+  AG -- "cliente" --> CAP{"Cabe em<br/>3.000 pedidos?"}
+  CAP -- "sim" --> VAR["Varre páginas e soma"]
+  CAP -- "não" --> RB["Rebaixa para filial<br/>e avisa em rebaixado"]
+  LIVE1 --> PAG
+  MOB --> PAG
+  LOC --> PAG
+  EX --> PAG
+  NA --> PAG
+  VAR --> PAG
+  RB --> PAG
+  PAG(["Resultado paginado<br/>até 80.000 caracteres"])
+  classDef good fill:#e1f4ea,stroke:#17714a,color:#0e1b2e
+  classDef warn fill:#fff1cf,stroke:#8a5a00,color:#0e1b2e
+  class PAG good
+  class RB warn
+</script>
+
+<script type="text/plain" id="d-ingestao">
+flowchart TB
+  subgraph ERP["WinThor"]
+    direction LR
+    MOB["Rotina mobile W106<br/>pedidos de venda"] ~~~ API["API de estoque<br/>e cadastros"]
+  end
+  subgraph ING["Segundo plano · pausa quando há tool em voo"]
+    direction LR
+    IV["VendasIngestaoService<br/>filial x período<br/>página a página: 100, mínimo 25<br/>3 retentativas"] ~~~ IE["EstoqueIngestaoService<br/>filial a filial"]
+  end
+  subgraph DISCO["WTA_DATA_DIR"]
+    direction LR
+    MV[("vendas-meta.db<br/>SQLite")] ~~~ FV[("vendas-fato.duckdb")] ~~~ ME[("estoque-meta.db")] ~~~ FE[("estoque-fato.duckdb")]
+  end
+  subgraph LEI["Tools de leitura"]
+    direction LR
+    TV["wt_vendas_base_local<br/>wt_faturamento_agregado"] ~~~ TE["wt_estoque_base_local<br/>wt_estoque_por_filial"]
+  end
+  MOB --> IV
+  API --> IE
+  IV --> MV
+  IV --> FV
+  IE --> ME
+  IE --> FE
+  MV --> TV
+  FV --> TV
+  ME --> TE
+  FE --> TE
+  AUTO["Gatilho automático<br/>verifica a cada 30 min<br/>revarre se a cobertura tem mais de 20 h"] -.-> ING
+  MAN["Gatilho manual<br/>wt_vendas_sincronizar<br/>wt_estoque_sincronizar<br/>POST /vendas/sincronizar"] -.-> ING
+</script>
+
+<script type="text/plain" id="d-dados">
+erDiagram
+  INSTANCIA ||--o{ LOTE : "tem"
+  INSTANCIA ||--o{ COBERTURA : "mapeia"
+  INSTANCIA ||--o{ ANCORA : "confere"
+  INSTANCIA ||--o{ FILIAL_ALVO : "alvos"
+  INSTANCIA ||--o{ DIM_FILIAL : "dimensão"
+  INSTANCIA ||--o{ DIM_CLIENTE : "dimensão"
+  INSTANCIA ||--o{ DIM_RCA : "dimensão"
+  INSTANCIA ||--o{ DIM_EMITENTE : "dimensão"
+  LOTE ||--o{ COBERTURA : "grava"
+  LOTE ||--o{ PEDIDO : "ingere"
+  DIM_FILIAL ||--o{ PEDIDO : "filial"
+  DIM_CLIENTE ||--o{ PEDIDO : "cliente"
+  DIM_RCA ||--o{ PEDIDO : "rca"
+  DIM_EMITENTE ||--o{ PEDIDO : "emitente"
+  INSTANCIA {
+    int id PK
+    text chave UK
+    text base_url
+    text login
+  }
+  LOTE {
+    int id PK
+    int instancia_id FK
+    text codigo_filial
+    text periodo
+    text posicao_pedido
+    text estado
+    int linhas
+    real divergencia_pct
+    int confere
+  }
+  COBERTURA {
+    int instancia_id PK
+    text codigo_filial PK
+    text dia PK
+    text posicao_pedido PK
+    int lote_id FK
+    int qt_pedidos
+    real valor
+  }
+  ANCORA {
+    int instancia_id PK
+    text codigo_filial PK
+    text periodo PK
+    text posicao_pedido PK
+    real valor_upstream
+    real valor_local
+    real divergencia_pct
+    int confere
+  }
+  FILIAL_ALVO {
+    int instancia_id PK
+    text codigo_filial PK
+  }
+  DIM_FILIAL {
+    int id PK
+    text codigo
+    text nome
+  }
+  DIM_CLIENTE {
+    int id PK
+    text codigo
+    text nome
+  }
+  DIM_RCA {
+    int id PK
+    text codigo
+    text nome
+  }
+  DIM_EMITENTE {
+    int id PK
+    text codigo
+    text nome
+  }
+  PEDIDO {
+    int instancia_id PK
+    text codigo_filial PK
+    text numero_pedido PK
+    date dia
+    text posicao_pedido
+    int dim_filial_id FK
+    int dim_cliente_id FK
+    int dim_rca_id FK
+    int dim_emitente_id FK
+    double valor_pedido
+    double custo_financeiro
+    double percentual_lucro
+    int lote_id FK
+  }
+</script>
+
+<script type="text/plain" id="d-desktop">
+flowchart TB
+  subgraph MAIN["Processo principal · Electron 35 · desktop/src"]
+    direction LR
+    M["main.ts<br/>ciclo de vida,<br/>trava de instância única"] ~~~ SP["server-process.ts<br/>spawn e encerramento<br/>do servidor"] ~~~ WN["windows.ts<br/>splash e janela principal"] ~~~ TR["tray.ts e icons.ts<br/>bandeja"] ~~~ ST["state.ts"] ~~~ AL["auto-launch.ts<br/>iniciar com o sistema"]
+  end
+  RND["renderer<br/>telas do app"]
+  subgraph CHILD["Processo filho · Node via ELECTRON_RUN_AS_NODE"]
+    NEST["Servidor NestJS<br/>cwd = pasta do servidor<br/>WTA_DATA_DIR = userData<br/>127.0.0.1:8787"]
+  end
+  RES[("extraResources<br/>server/dist, views, public,<br/>node_modules")]
+  UD[("userData<br/>config e bases locais")]
+  M --> SP
+  M --> WN
+  M --> TR
+  M --> AL
+  WN --> RND
+  SP -- "spawn" --> NEST
+  NEST -- "lê o código de" --> RES
+  NEST -- "grava em" --> UD
+  WN -- "carrega http://127.0.0.1:8787" --> NEST
+</script>
+
+<script type="text/plain" id="d-seq-subida">
+sequenceDiagram
+  autonumber
+  actor U as Usuário
+  participant App as Electron
+  participant F as Processo Node filho
+  participant H as NestJS 8787
+  U->>App: abre o wt.ai
+  App->>App: trava de instância única
+  App->>App: cria bandeja e splash
+  App->>F: spawn com ELECTRON_RUN_AS_NODE
+  Note over F: cwd = pasta do servidor<br/>WTA_DATA_DIR = userData
+  F->>H: escuta em 127.0.0.1:8787
+  H-->>App: porta respondendo
+  App->>U: fecha o splash e abre a janela
+  U->>App: sai do aplicativo
+  App->>F: pede encerramento
+  F-->>App: processo termina, porta liberada
+  Note over App: segunda abertura só traz a janela existente
+</script>
+
+<script type="text/plain" id="d-seq-config">
+sequenceDiagram
+  autonumber
+  actor U as Usuário
+  participant UI as Página inicial
+  participant S as SetupController
+  participant A as WinthorAuthService
+  participant W as WinThor WTA
+  participant D as config.json
+  U->>UI: informa URL, login e senha
+  UI->>S: POST /setup
+  S->>A: testConnection
+  A->>A: MD5 maiúsculo da senha
+  A->>W: POST /winthor/autenticacao/v1/login
+  W-->>A: accessToken
+  A->>W: GET /winthor/autenticacao/v1/logado
+  W-->>A: sessão válida
+  alt conexão aceita
+    S->>D: grava URL, login e senha em MD5
+    S-->>U: página configurada com a URL do MCP
+    U->>S: POST /setup/mcp/cursor ou claude ou chatgpt
+    S-->>U: servidor wt.ai gravado no arquivo de MCP do cliente
+  else conexão recusada
+    S-->>U: erro, nada é gravado
+  end
+</script>
+
+<script type="text/plain" id="d-seq-pergunta">
+sequenceDiagram
+  autonumber
+  actor AI as Assistente de IA
+  participant M as /mcp
+  participant F as McpServerFactory
+  participant T as Tool wt
+  participant L as Base local
+  participant W as WinThor
+  AI->>M: tools/call
+  alt servidor sem config.json
+    M-->>AI: 503 not_configured
+  else configurado
+    M->>M: marca vendas e estoque como ocupados
+    M->>F: cria o servidor MCP
+    F->>T: handler da tool
+    alt vendas ou estoque agregados
+      T->>L: lê DuckDB e SQLite
+      L-->>T: linhas e cobertura
+    else cadastro, filial ou mobile
+      T->>W: API com o token
+      W-->>T: JSON
+    end
+    T->>T: pagina com teto de página e de caracteres
+    T-->>AI: resultado com página e continuação
+  end
+</script>
+
+<script type="text/plain" id="d-estado">
+stateDiagram-v2
+  state "Servidor" as SRV {
+    [*] --> NaoConfigurado
+    NaoConfigurado --> Configurado : POST setup aceito pelo WinThor
+    Configurado --> NaoConfigurado : POST setup reset
+    Configurado --> Configurado : nova URL ou login
+  }
+  state "Ingestão" as IG {
+    [*] --> Ociosa
+    Ociosa --> Rodando : gatilho automático ou manual
+    Rodando --> Rodando : tool em voo, pausa de 3 s por página
+    Rodando --> Concluida : todos os lotes gravados
+    Rodando --> ConcluidaComAvisos : algum lote falhou
+    Rodando --> Cancelada : cancelamento
+    Concluida --> Ociosa
+    ConcluidaComAvisos --> Ociosa
+    Cancelada --> Ociosa
+  }
+  note right of NaoConfigurado
+    POST /mcp responde 503
+    not_configured
+  end note
+</script>
+
+<script type="text/plain" id="d-build">
+flowchart TB
+  S1["Estágio 1 · server-build<br/>npm ci completo e nest build<br/>remove .map, .d.ts e tsbuildinfo"]
+  S2["Estágio 2 · server-runtime-deps<br/>npm ci --omit=dev<br/>remove source maps de terceiros"]
+  S3["Estágio 3 · packager<br/>monta o layout do electron-builder<br/>compila o desktop e empacota"]
+  V{"verify-artifacts.sh<br/>source map, .d.ts, .ts, .env,<br/>config.json ou rede privada?"}
+  OUT["Estágio 4 · export (alpine)<br/>só .exe, .AppImage, .blockmap, latest.yml"]
+  HOST(["desktop/release/ no host"])
+  FAIL(["Build falha"])
+  S1 --> S3
+  S2 --> S3
+  S3 --> V
+  V -- "achou algo" --> FAIL
+  V -- "limpo" --> OUT
+  OUT --> HOST
+  classDef good fill:#e1f4ea,stroke:#17714a,color:#0e1b2e
+  classDef bad fill:#fde6e3,stroke:#b3261e,color:#0e1b2e
+  class HOST good
+  class FAIL bad
+</script>
+
+<script>
+/* [id, comp, requisito, prioridade, status, critério de aceite] */
+const RF = [
+ ["MCP-01","MCP","Endpoint MCP HTTP em `/mcp` (JSON-RPC) para clientes de IA","Must","Implementado","Cursor, Claude e ChatGPT chamam `tools/list` e `tools/call`"],
+ ["MCP-02","MCP","Responder 503 `not_configured` enquanto não houver configuração válida","Must","Implementado","Mensagem orienta abrir a tela de configuração"],
+ ["MCP-03","MCP","Tools de servidor: `wt_ping`, `wt_test_connection`, `wt_server_info`","Must","Implementado","Retornam estado do processo e do login WTA"],
+ ["MCP-04","MCP","Tools de cadastro: `wt_list_filiais` (cache curto), `wt_buscar_clientes`, `wt_buscar_pedidos_venda`","Must","Implementado","Clientes por código/nome; pedidos com status (padrão `ATIVO`) e data de alteração"],
+ ["MCP-05","MCP","Tools de vendas: `wt_vendas_base_local` e `wt_vendas_sincronizar`","Must","Implementado","Mostra cobertura e dispara a sincronização com progresso"],
+ ["MCP-06","MCP","Tools de estoque: `wt_estoque_base_local`, `wt_estoque_por_filial`, `wt_estoque_sincronizar`","Must","Implementado","Por filial usa a base local se sincronizada; senão API ao vivo"],
+ ["MCP-07","MCP","Inadimplência (W120): valor da carteira, por dia de atraso, por valor, cliente, cobrança, filial, ramo, supervisor, e pesquisas auxiliares","Should","Implementado","Dados ao vivo das rotinas mobile; carteira é posição atual"],
+ ["MCP-08","MCP","Lucratividade (W106): por RCA, pedidos, itens, faltas e pesquisas auxiliares","Should","Implementado","Valor, custo financeiro, CMV e lucro; descida até o item do pedido"],
+ ["MCP-09","MCP","`wt_faturamento_agregado` por filial, supervisor, RCA ou cliente, com intervalo livre pela base local","Must","Implementado","Agrupamento por cliente grande rebaixa para filial e avisa em `rebaixado`"],
+ ["MCP-10","MCP","Paginação em todas as tools, com envelope de página, tamanho e continuação","Must","Implementado","Tamanho padrão 10, teto 200; `pagination.spec.ts` verde"],
+ ["MCP-11","MCP","Orçamento de caracteres por resposta, com registro de erro se o truncamento disparar","Should","Implementado","Limite 80.000 (`WTA_MAX_RESULT_CHARS`)"],
+ ["MCP-12","MCP","Autenticação WTA: MD5 maiúsculo, token em memória, reuso por 10 min e nova tentativa em 401","Must","Implementado","Token renovado ao mudar URL ou login"],
+ ["MCP-13","MCP","Timeout de 20 s e limite de 8 MB por resposta do WinThor","Must","Implementado","Excesso vira erro tratado, não trava o servidor"],
+ ["MCP-14","MCP","Cache de listas completas (clientes e filiais) com TTL, entradas e tamanho máximos","Should","Implementado","2 min; 8 entradas; 16 milhões de caracteres"],
+ ["MCP-15","MCP","Conferir somas locais contra o total declarado pelo WinThor","Should","Implementado","Divergência até 0,5% é aceita"],
+ ["ING-01","ING","Base local de vendas: SQLite (metadados, cobertura) e DuckDB (fato `pedido`)","Must","Implementado","Esquema versionado e migrável"],
+ ["ING-02","ING","Base local de estoque no mesmo desenho","Must","Implementado","Fotografia por filial com validade"],
+ ["ING-03","ING","Ingestão em segundo plano por filial x período, página a página, com pageSize adaptativo e retentativas","Must","Implementado","100 por página, mínimo 25; 3 retentativas em timeout"],
+ ["ING-04","ING","Pausar a ingestão enquanto uma tool MCP está em andamento","Must","Implementado","Pausa de 250 ms; 3 s quando há tool em voo"],
+ ["ING-05","ING","Sincronização automática por idade da cobertura","Should","Implementado","Verifica a cada 30 min; revarre se passou de 20 h; desligável com `WTA_INGESTAO_AUTO=0`"],
+ ["ING-06","ING","Retenção do ano atual e do anterior","Should","Implementado","`WTA_RETENCAO_ANOS=2`"],
+ ["ING-07","ING","Registrar cobertura por dia, filial e posição, e âncora de conferência por recorte","Must","Implementado","Lote guarda total upstream, total local, divergência e `confere`"],
+ ["ING-08","ING","Migração de esquema das bases","Should","Implementado","Meta v3 e fato v1; `vendas-migracao.spec.ts`"],
+ ["ING-09","ING","Sincronização sob demanda com status de progresso (tools e `/vendas/status`, `/vendas/sincronizar`)","Must","Implementado","Mostra lote atual, linhas gravadas e erros"],
+ ["ING-10","ING","Estoque com cobertura e consulta por dimensão equivalentes às de vendas","Could","Parcial","Há cobertura e ingestão; paridade total com vendas não verificada"],
+ ["UI-01","UI","Tela inicial para informar URL do WinThor, login e senha","Must","Implementado","Grava `config.json` com senha em MD5"],
+ ["UI-02","UI","Testar a conexão antes de gravar e permitir reset da configuração","Must","Implementado","`POST /setup`, `/setup/test`, `/setup/reset`"],
+ ["UI-03","UI","Gravar o servidor `wt.ai` na configuração MCP de Cursor, Claude Desktop, Claude Code e ChatGPT","Should","Implementado","`POST /setup/mcp/*`; `mcp-client-config.service.spec.ts`"],
+ ["UI-04","UI","Página configurada mostra a URL do MCP e o status de vendas","Should","Implementado","`configured.hbs` e `/vendas/status`"],
+ ["DSK-01","DSK","Subir o servidor como processo filho (`ELECTRON_RUN_AS_NODE`) com dados em `userData`","Must","Implementado","Janela abre quando a porta responde"],
+ ["DSK-02","DSK","Instância única do aplicativo","Must","Implementado","Segunda abertura só traz a janela existente"],
+ ["DSK-03","DSK","Bandeja do sistema e tela de abertura","Should","Implementado","Ícones desempacotados do asar"],
+ ["DSK-04","DSK","Iniciar com o sistema operacional","Could","Implementado","`setLoginItemSettings` em `auto-launch.ts`"],
+ ["DSK-05","DSK","Encerrar o processo filho ao sair","Must","Implementado","Porta 8787 liberada"],
+ ["DSK-06","DSK","Instaladores: Windows (NSIS), Linux (AppImage) e macOS","Should","Parcial","Windows e Linux saem do Docker; macOS exige build nativo (`dist:mac`)"],
+ ["DSK-07","DSK","Validar o pacote contra source maps, tipos, fontes, credenciais e endereços privados","Must","Implementado","`verify-artifacts.sh` falha o build se achar algo"],
+ ["DSK-08","DSK","Atualização automática do aplicativo","Could","Pendente","Gera `latest*.yml`, mas não encontrei código de auto-update"]
+];
+</script>
+
+<script>
+(function(){
+  'use strict';
+  var root=document.documentElement;
+
+  /* ---------- tema ---------- */
+  function lerTema(){try{return localStorage.getItem('mcpwinthor-doc-tema')}catch(e){return null}}
+  function gravaTema(v){try{localStorage.setItem('mcpwinthor-doc-tema',v)}catch(e){}}
+  function escuro(){
+    var t=root.getAttribute('data-t');
+    if(t==='dark')return true; if(t==='light')return false;
+    return window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  var salvo=lerTema(); if(salvo==='dark'||salvo==='light')root.setAttribute('data-t',salvo);
+
+  /* ---------- requisitos funcionais ---------- */
+  var tb=document.querySelector('#rft tbody');
+  var cls={Must:'t-must',Should:'t-should',Could:'t-could'};
+  var st={Implementado:'s-ok',Parcial:'s-part',Pendente:'s-pend'};
+  var tc={MCP:'t-fe',ING:'t-be',DSK:'t-ia',UI:'t-could'};
+  function esc(s){return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})}
+  function md(s){return esc(s).replace(/`([^`]+)`/g,'<code>$1</code>')}
+  function monta(){
+    var h='';
+    RF.forEach(function(r){
+      h+='<tr data-c="'+r[1]+'" data-p="'+r[3]+'" data-s="'+r[4]+'">'
+        +'<td class="id">'+r[0]+'</td>'
+        +'<td><span class="tag '+tc[r[1]]+'">'+r[1]+'</span></td>'
+        +'<td>'+md(r[2])+'</td>'
+        +'<td><span class="tag '+cls[r[3]]+'">'+r[3]+'</span></td>'
+        +'<td><span class="tag '+st[r[4]]+'">'+r[4]+'</span></td>'
+        +'<td>'+md(r[5])+'</td></tr>';
+    });
+    tb.innerHTML=h;
+  }
+  function filtra(){
+    var q=document.getElementById('rfq').value.trim().toLowerCase();
+    var c=document.getElementById('rfc').value,p=document.getElementById('rfp').value,s=document.getElementById('rfs').value;
+    var n=0;
+    Array.prototype.forEach.call(tb.rows,function(tr){
+      var ok=(!c||tr.dataset.c===c)&&(!p||tr.dataset.p===p)&&(!s||tr.dataset.s===s)&&(!q||tr.textContent.toLowerCase().indexOf(q)>-1);
+      tr.hidden=!ok; if(ok)n++;
+    });
+    document.getElementById('rfn').textContent=n+' de '+RF.length+' requisitos';
+  }
+  monta();
+  ['rfq','rfc','rfp','rfs'].forEach(function(id){document.getElementById(id).addEventListener('input',filtra)});
+  filtra();
+
+  /* KPIs de rastreabilidade (calculados da própria tabela) */
+  (function(){
+    var k=document.getElementById('rkpi');
+    var comps=['MCP','ING','DSK','UI'],tot={},imp={};
+    comps.forEach(function(c){tot[c]=0;imp[c]=0});
+    RF.forEach(function(r){tot[r[1]]++;if(r[4]==='Implementado')imp[r[1]]++});
+    var nome={MCP:'Servidor MCP e tools',ING:'Ingestão e base local',DSK:'App desktop',UI:'Interface de configuração'},out='';
+    comps.forEach(function(c){
+      var pct=Math.round(100*imp[c]/tot[c]);
+      out+='<div class="kpi"><b>'+imp[c]+' / '+tot[c]+'</b><span>'+nome[c]+': implementados ('+pct+'%)</span></div>';
+    });
+    k.innerHTML=out;
+  })();
+
+  /* ---------- sumário: realce e menu móvel ---------- */
+  var toc=document.getElementById('toc'),links=[].slice.call(toc.querySelectorAll('a'));
+  document.getElementById('menuBtn').addEventListener('click',function(){toc.classList.toggle('open')});
+  links.forEach(function(a){a.addEventListener('click',function(){toc.classList.remove('open')})});
+  var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'))}).filter(Boolean);
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(e.isIntersecting){
+          links.forEach(function(a){a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id)});
+        }
+      });
+    },{rootMargin:'-15% 0px -75% 0px'});
+    secs.forEach(function(s){io.observe(s)});
+  }
+
+  document.getElementById('printBtn').addEventListener('click',function(){window.print()});
+
+  /* ---------- diagramas (Mermaid) ---------- */
+  var figs=[].slice.call(document.querySelectorAll('figure.dg'));
+  var rendered={};   // id -> svg do último render
+  var seq=0;
+
+  function fonte(fig){var el=document.getElementById(fig.getAttribute('data-src'));return el?el.textContent.trim():''}
+
+  function mostraFalha(fig,msg){
+    var st=fig.querySelector('.stage');
+    st.innerHTML='<div class="dg-fail"><b>Não foi possível desenhar este diagrama'+(msg?' ('+esc(msg)+')':'')+'.</b> Texto-fonte (Mermaid):<pre>'+esc(fonte(fig))+'</pre></div>';
+  }
+
+  function config(){
+    var d=escuro();
+    mermaid.initialize({
+      startOnLoad:false,
+      securityLevel:'loose',
+      theme:d?'dark':'default',
+      fontFamily:'system-ui,-apple-system,Segoe UI,Roboto,sans-serif',
+      flowchart:{htmlLabels:true,curve:'basis',useMaxWidth:true,nodeSpacing:34,rankSpacing:44},
+      sequence:{useMaxWidth:true,mirrorActors:false,wrap:true,width:150},
+      er:{useMaxWidth:true},
+      state:{useMaxWidth:true}
+    });
+  }
+
+  /* Mostra no tamanho natural quando cabe; senão encolhe até 70% e o resto rola na horizontal (texto sempre legível). */
+  function ajustaLargura(stage){
+    var svg=stage.querySelector('svg');if(!svg||!svg.viewBox||!svg.viewBox.baseVal)return;
+    var nat=svg.viewBox.baseVal.width,avail=stage.clientWidth-28;
+    if(!nat||avail<=0)return;
+    svg.style.maxWidth='none';
+    svg.style.width=Math.round(Math.min(nat,Math.max(avail,nat*0.7)))+'px';
+  }
+
+  async function desenha(){
+    config();
+    for(var i=0;i<figs.length;i++){
+      var fig=figs[i],id=fig.getAttribute('data-src');
+      try{
+        var r=await mermaid.render('mm'+(++seq),fonte(fig));
+        var stage=fig.querySelector('.stage');
+        stage.innerHTML=r.svg;
+        rendered[id]=r.svg;
+        ajustaLargura(stage);
+      }catch(e){
+        mostraFalha(fig,(e&&e.message?e.message:'').split('\n')[0]);
+      }
+    }
+  }
+
+  var tRs;
+  window.addEventListener('resize',function(){
+    clearTimeout(tRs);
+    tRs=setTimeout(function(){figs.forEach(function(f){ajustaLargura(f.querySelector('.stage'))})},150);
+  });
+
+  function carregaMermaid(){
+    return new Promise(function(res,rej){
+      if(window.mermaid){res();return}
+      var s=document.createElement('script');
+      s.src='https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js';
+      s.onload=res;s.onerror=function(){rej(new Error('script do Mermaid não carregou'))};
+      document.head.appendChild(s);
+    });
+  }
+
+  figs.forEach(function(f){f.querySelector('.stage').innerHTML='<span class="small">Desenhando diagrama...</span>'});
+  carregaMermaid().then(desenha).catch(function(e){figs.forEach(function(f){mostraFalha(f,e.message)})});
+
+  document.getElementById('themeBtn').addEventListener('click',function(){
+    var novo=escuro()?'light':'dark';
+    root.setAttribute('data-t',novo);gravaTema(novo);
+    if(window.mermaid)desenha();
+  });
+
+  /* ---------- ampliar diagrama ---------- */
+  var dlg=document.getElementById('zm'),zb=document.getElementById('zb'),zt=document.getElementById('zt'),escala=1;
+  function aplicaEscala(){var s=zb.querySelector('svg');if(s){s.style.width=Math.round(1100*escala)+'px';s.style.maxWidth='none'}}
+  figs.forEach(function(f){
+    f.querySelector('.zoom').addEventListener('click',function(){
+      var id=f.getAttribute('data-src');
+      if(!rendered[id]){return}
+      zt.textContent=f.getAttribute('data-title')||'Diagrama';
+      zb.innerHTML=rendered[id];escala=1;aplicaEscala();
+      if(dlg.showModal)dlg.showModal();else dlg.setAttribute('open','');
+    });
+  });
+  document.getElementById('zc').addEventListener('click',function(){dlg.close?dlg.close():dlg.removeAttribute('open')});
+  document.getElementById('zin').addEventListener('click',function(){escala=Math.min(escala+.25,3);aplicaEscala()});
+  document.getElementById('zout').addEventListener('click',function(){escala=Math.max(escala-.25,.5);aplicaEscala()});
+  dlg.addEventListener('click',function(e){if(e.target===dlg)dlg.close()});
+})();
+</script>
+</body>
+</html>
