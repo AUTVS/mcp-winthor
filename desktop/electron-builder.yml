@@ -52,16 +52,20 @@ mac:
     - dmg
     - zip
   icon: build/icon.icns
+  # Padrão de mercado: <produto>-<versão>-<so>-<arquitetura>.<ext>
+  artifactName: wt.ai-${version}-macos-${arch}.${ext}
 
 win:
   target:
     - nsis
   icon: build/icon-512.png
+  artifactName: wt.ai-${version}-windows-${arch}-setup.${ext}
 
 linux:
   target:
     - AppImage
   icon: build/icon-512.png
+  artifactName: wt.ai-${version}-linux-${arch}.${ext}
   category: Development
   synopsis: Servidor MCP que conecta o ERP WinThor a assistentes de IA
 

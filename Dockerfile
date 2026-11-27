@@ -83,14 +83,18 @@ RUN bash /usr/local/bin/verify-artifacts.sh \
       /build/desktop/node_modules/@electron/asar/bin/asar.js
 
 # Só os instaladores seguem adiante; linux-unpacked/win-unpacked ficam para trás.
-RUN mkdir -p /out \
- && find /build/desktop/release -maxdepth 1 -type f \
-      \( -name '*.AppImage' -o -name '*.exe' -o -name '*.blockmap' -o -name 'latest*.yml' \) \
-      -exec cp -v {} /out/ \;
+# Organizados por sistema: windows/ e linux/ (mac/ vem do build nativo).
+RUN mkdir -p /out/windows /out/linux \
+ && cd /build/desktop/release \
+ && find . -maxdepth 1 -type f \( -name '*.exe' -o -name '*.exe.blockmap' -o -name 'latest.yml' \) \
+      -exec cp -v {} /out/windows/ \; \
+ && find . -maxdepth 1 -type f \( -name '*.AppImage' -o -name 'latest-linux.yml' \) \
+      -exec cp -v {} /out/linux/ \; \
+ && find /out -type d -empty -delete
 
 # ---------------------------------------------------------------------------
 # 4. Imagem final: carrega apenas os instaladores validados
 # ---------------------------------------------------------------------------
 FROM --platform=linux/amd64 alpine:3.21 AS export
 COPY --from=packager /out /out
-CMD ["sh", "-c", "cp -v /out/* /export/"]
+CMD ["sh", "-c", "cp -rv /out/* /export/"]
