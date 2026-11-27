@@ -10,7 +10,8 @@
 # Em todos os caminhos, source maps e declarações de tipo são removidos antes do
 # empacotamento e scripts/verify-artifacts.sh confere o resultado.
 #
-# Artefatos saem em desktop/release/.
+# Artefatos saem em desktop/release/{windows,mac,linux}/, com nomes no padrão
+# wt.ai-<versão>-<so>-<arquitetura>.<ext> (ex.: wt.ai-0.1.2-windows-x64-setup.exe).
 
 set -euo pipefail
 
@@ -254,8 +255,13 @@ if $BUILD_MAC; then
 
   echo "==> Validando artefatos macOS"
   bash "$VERIFY" "$RELEASE_DIR" "$ASAR_CLI"
+
+  # Mesma organização por sistema dos alvos Docker: release/mac/
+  mkdir -p "$RELEASE_DIR/mac"
+  mv -f "$RELEASE_DIR"/*.dmg "$RELEASE_DIR"/*.zip "$RELEASE_DIR"/*.blockmap \
+        "$RELEASE_DIR"/latest-mac.yml "$RELEASE_DIR/mac/" 2>/dev/null || true
 fi
 
 echo
 echo "==> Artefatos em desktop/release/ (versão $VERSAO)"
-ls -lh "$RELEASE_DIR"
+ls -lhR "$RELEASE_DIR/windows" "$RELEASE_DIR/mac" "$RELEASE_DIR/linux" 2>/dev/null || ls -lh "$RELEASE_DIR"
